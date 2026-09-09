@@ -19,6 +19,18 @@ import Lenis from 'lenis';
 
 import './styles.css';
 
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate
+} from 'react-router-dom';
+
+import AdminLogin from './admin/pages/AdminLogin';
+import AdminDashboard from './admin/pages/AdminDashboard';
+import AdminClients from './admin/pages/AdminClients';
+import ProtectedAdminRoute from './admin/components/ProtectedAdminRoute';
+
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -3274,8 +3286,76 @@ viewport.removeEventListener(
 
 ReactDOM
   .createRoot(
-    document.getElementById('root')
+    document.getElementById("root")
   )
   .render(
-    <App />
+    <BrowserRouter>
+
+      <Routes>
+
+        {/* ================================
+            HOMEPAGE
+        ================================ */}
+
+        <Route
+          path="/"
+          element={<App />}
+        />
+
+
+        {/* ================================
+            ADMIN LOGIN
+        ================================ */}
+
+        <Route
+          path="/admin/login"
+          element={<AdminLogin />}
+        />
+
+
+        {/* ================================
+            ADMIN DASHBOARD
+        ================================ */}
+
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedAdminRoute>
+              <AdminDashboard />
+            </ProtectedAdminRoute>
+          }
+        />
+
+
+        {/* ================================
+            ADMIN CLIENTS
+        ================================ */}
+
+        <Route
+          path="/admin/clients"
+          element={
+            <ProtectedAdminRoute>
+              <AdminClients />
+            </ProtectedAdminRoute>
+          }
+        />
+
+
+        {/* ================================
+            UNKNOWN ROUTE
+        ================================ */}
+
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
+        />
+
+      </Routes>
+
+    </BrowserRouter>
   );
