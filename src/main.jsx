@@ -693,10 +693,119 @@ function App() {
           };
 
 
+          
+         /* ===================================================
+   MOUSE DRAG — DESKTOP
+=================================================== */
+
+let isDragging = false;
+let dragStartX = 0;
+let dragStartTranslate = 0;
+
+const getMaxMove = () => {
+  return Math.max(
+    0,
+    track.scrollWidth - viewport.clientWidth
+  );
+};
+
+const clampX = (x) => {
+  return Math.max(
+    -getMaxMove(),
+    Math.min(0, x)
+  );
+};
+
+const handlePointerDown = (e) => {
+  isDragging = true;
+
+  dragStartX = e.clientX;
+
+  dragStartTranslate =
+    Number(gsap.getProperty(track, 'x')) || 0;
+
+  gsap.killTweensOf(track);
+
+  viewport.setPointerCapture(e.pointerId);
+
+  viewport.style.cursor = 'grabbing';
+};
+
+const handlePointerMove = (e) => {
+  if (!isDragging) return;
+
+  const distance =
+    e.clientX - dragStartX;
+
+  const newX =
+    clampX(
+      dragStartTranslate + distance
+    );
+
+  gsap.set(track, {
+    x: newX
+  });
+};
+
+const handlePointerUp = (e) => {
+  if (!isDragging) return;
+
+  isDragging = false;
+
+  try {
+    viewport.releasePointerCapture(
+      e.pointerId
+    );
+  } catch {}
+
+  viewport.style.cursor = 'grab';
+
+  const currentX =
+    Number(gsap.getProperty(track, 'x')) || 0;
+
+  const step = getStep();
+
+  const maxMove = getMaxMove();
+
+  let nearestIndex =
+    Math.round(
+      Math.abs(currentX) / step
+    );
+
+  nearestIndex =
+    Math.max(
+      0,
+      Math.min(
+        nearestIndex,
+        Math.ceil(maxMove / step)
+      )
+    );
+
+  moveTo(nearestIndex);
+};
+
+viewport.addEventListener(
+  'pointerdown',
+  handlePointerDown
+);
+
+viewport.addEventListener(
+  'pointermove',
+  handlePointerMove
+);
+
+viewport.addEventListener(
+  'pointerup',
+  handlePointerUp
+);
+
+viewport.addEventListener(
+  'pointercancel',
+  handlePointerUp
+);
           /*
             Initial position
           */
-
           moveTo(0, true);
 
 
@@ -840,6 +949,26 @@ function App() {
               'resize',
               handleResize
             );
+
+            viewport.removeEventListener(
+  'pointerdown',
+  handlePointerDown
+);
+
+viewport.removeEventListener(
+  'pointermove',
+  handlePointerMove
+);
+
+viewport.removeEventListener(
+  'pointerup',
+  handlePointerUp
+);
+
+viewport.removeEventListener(
+  'pointercancel',
+  handlePointerUp
+);
 
             gsap.killTweensOf(
               track

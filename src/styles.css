@@ -2687,6 +2687,21 @@ a {
 
   background:
     var(--paper) !important;
+
+  
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+
+  scroll-behavior: smooth;
+  cursor: default;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+}
+.capabilities-viewport::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 
@@ -2715,7 +2730,7 @@ a {
     clamp(18px, 1.7vw, 28px) !important;
 
   transform:
-    translate3d(0,0,0);
+    none !important;
 
   will-change:
     transform;
