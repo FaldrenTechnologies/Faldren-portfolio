@@ -1,4 +1,9 @@
-import React, { useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState
+} from "react";
+
 import {
   Search,
   Plus,
@@ -10,76 +15,317 @@ import AdminSidebar from "../components/AdminSidebar";
 import "../admin.css";
 
 
-const initialProjects = [
-  {
-    id: 1,
-    title: "Company Website",
-    clientName: "FJ Studio",
-    category: "Website",
-    status: "DEVELOPMENT",
-    progress: 65,
-    dueDate: "2026-09-30",
-    priority: "HIGH"
-  },
-  {
-    id: 2,
-    title: "Business Dashboard",
-    clientName: "HK Technologies",
-    category: "Web Application",
-    status: "DESIGN",
-    progress: 30,
-    dueDate: "2026-10-10",
-    priority: "MEDIUM"
-  },
-  {
-    id: 3,
-    title: "Consultancy Website",
-    clientName: "Best Auto Consultancy",
-    category: "Website",
-    status: "PLANNING",
-    progress: 10,
-    dueDate: "2026-10-20",
-    priority: "LOW"
-  }
-];
+const API_BASE =
+  "http://localhost:8080";
 
 
 function AdminProjects() {
 
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [projects, setProjects] =
+    useState([]);
+
+  const [search, setSearch] =
+    useState("");
+
+  const [statusFilter, setStatusFilter] =
+    useState("ALL");
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
 
 
-  const filteredProjects = initialProjects.filter((project) => {
-
-    const searchValue = search.toLowerCase();
-
-    const matchesSearch =
-      project.title.toLowerCase().includes(searchValue) ||
-      project.clientName.toLowerCase().includes(searchValue) ||
-      project.category.toLowerCase().includes(searchValue);
+  const adminName =
+    localStorage.getItem(
+      "adminName"
+    ) || "Administrator";
 
 
-    const matchesStatus =
-      statusFilter === "ALL" ||
-      project.status === statusFilter;
+  // ==========================================
+  // LOAD PROJECTS
+  // ==========================================
+
+  const loadProjects =
+    async () => {
+
+      const token =
+        localStorage.getItem(
+          "adminToken"
+        );
 
 
-    return matchesSearch && matchesStatus;
+      if (!token) {
 
-  });
+        window.location.href =
+          "/admin/login";
+
+        return;
+      }
 
 
-  const formatStatus = (status) => {
+      try {
 
-    if (status === "ON_HOLD") {
-      return "ON HOLD";
-    }
+        setLoading(true);
+        setError("");
 
-    return status;
 
-  };
+        const response =
+          await fetch(
+            `${API_BASE}/api/admin/projects`,
+            {
+              method: "GET",
 
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+
+        // Admin session expired / invalid
+
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+
+          localStorage.removeItem(
+            "adminToken"
+          );
+
+          localStorage.removeItem(
+            "adminName"
+          );
+
+          localStorage.removeItem(
+            "adminEmail"
+          );
+
+          localStorage.removeItem(
+            "adminRole"
+          );
+
+          window.location.href =
+            "/admin/login";
+
+          return;
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          setError(
+            data.message ||
+            "Unable to load projects."
+          );
+
+          return;
+        }
+
+
+        setProjects(
+          Array.isArray(data)
+            ? data
+            : []
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Project loading error:",
+          error
+        );
+
+
+        setError(
+          "Unable to connect to the backend."
+        );
+
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+
+  useEffect(() => {
+
+    loadProjects();
+
+  }, []);
+
+
+  // ==========================================
+  // SEARCH + FILTER
+  // ==========================================
+
+  const filteredProjects =
+    useMemo(() => {
+
+      const searchValue =
+        search
+          .trim()
+          .toLowerCase();
+
+
+      return projects.filter(
+        (project) => {
+
+          const title =
+            project.title || "";
+
+          const clientName =
+            project.clientFullName || "";
+
+          const companyName =
+            project.clientCompany || "";
+
+          const category =
+            project.serviceType || "";
+
+          const status =
+            project.status || "";
+
+
+          const matchesSearch =
+
+            title
+              .toLowerCase()
+              .includes(searchValue) ||
+
+            clientName
+              .toLowerCase()
+              .includes(searchValue) ||
+
+            companyName
+              .toLowerCase()
+              .includes(searchValue) ||
+
+            category
+              .toLowerCase()
+              .includes(searchValue);
+
+
+          const matchesStatus =
+
+            statusFilter === "ALL" ||
+
+            status === statusFilter;
+
+
+          return (
+            matchesSearch &&
+            matchesStatus
+          );
+
+        }
+      );
+
+    }, [
+      projects,
+      search,
+      statusFilter
+    ]);
+
+
+  // ==========================================
+  // FORMAT STATUS
+  // ==========================================
+
+  const formatStatus =
+    (status) => {
+
+      if (!status) {
+        return "—";
+      }
+
+
+      return status.replaceAll(
+        "_",
+        " "
+      );
+
+    };
+
+
+  // ==========================================
+  // FORMAT DATE
+  // ==========================================
+
+  const formatDate =
+    (date) => {
+
+      if (!date) {
+        return "—";
+      }
+
+
+      const parsed =
+        new Date(
+          `${date}T00:00:00`
+        );
+
+
+      if (
+        Number.isNaN(
+          parsed.getTime()
+        )
+      ) {
+        return date;
+      }
+
+
+      return parsed.toLocaleDateString(
+        "en-IN",
+        {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        }
+      );
+
+    };
+
+
+  // ==========================================
+  // CLIENT DISPLAY NAME
+  // ==========================================
+
+  const getClientDisplay =
+    (project) => {
+
+      if (
+        project.clientCompany &&
+        project.clientCompany.trim()
+      ) {
+
+        return project.clientCompany;
+
+      }
+
+
+      return (
+        project.clientFullName ||
+        "Client"
+      );
+
+    };
+
+
+  // ==========================================
+  // UI
+  // ==========================================
 
   return (
 
@@ -91,7 +337,7 @@ function AdminProjects() {
       <main className="admin-main">
 
 
-        {/* TOP BAR */}
+        {/* ================= TOP BAR ================= */}
 
         <header className="admin-topbar">
 
@@ -113,7 +359,7 @@ function AdminProjects() {
             <div className="admin-profile-copy">
 
               <strong>
-                Administrator
+                {adminName}
               </strong>
 
               <span>
@@ -124,7 +370,11 @@ function AdminProjects() {
 
 
             <div className="admin-avatar">
-              A
+
+              {adminName
+                .charAt(0)
+                .toUpperCase()}
+
             </div>
 
           </div>
@@ -133,7 +383,7 @@ function AdminProjects() {
 
 
 
-        {/* INTRO */}
+        {/* ================= INTRO ================= */}
 
         <section className="admin-projects-intro">
 
@@ -145,12 +395,14 @@ function AdminProjects() {
 
 
             <h2>
+
               Work in
               <br />
 
               <em>
                 motion.
               </em>
+
             </h2>
 
 
@@ -169,7 +421,14 @@ function AdminProjects() {
             </span>
 
             <strong>
-              {String(initialProjects.length).padStart(2, "0")}
+
+              {String(
+                projects.length
+              ).padStart(
+                2,
+                "0"
+              )}
+
             </strong>
 
           </div>
@@ -178,9 +437,10 @@ function AdminProjects() {
 
 
 
-        {/* SEARCH + FILTER */}
+        {/* ================= SEARCH + FILTER ================= */}
 
         <section className="admin-project-actions">
+
 
           <div className="admin-project-search">
 
@@ -193,21 +453,29 @@ function AdminProjects() {
               type="text"
               placeholder="Search projects..."
               value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
+              onChange={
+                (event) =>
+                  setSearch(
+                    event.target.value
+                  )
               }
             />
 
           </div>
 
 
+
           <div className="admin-project-action-right">
+
 
             <select
               className="admin-project-filter"
               value={statusFilter}
-              onChange={(e) =>
-                setStatusFilter(e.target.value)
+              onChange={
+                (event) =>
+                  setStatusFilter(
+                    event.target.value
+                  )
               }
             >
 
@@ -242,9 +510,16 @@ function AdminProjects() {
             </select>
 
 
+
+            {/* 
+              Manual project creation
+              backend flow later.
+            */}
+
             <button
               className="admin-create-project-btn"
               type="button"
+              title="Manual project creation will be added next"
             >
 
               <Plus
@@ -262,166 +537,310 @@ function AdminProjects() {
 
 
 
-        {/* PROJECT TABLE */}
+        {/* ================= ERROR ================= */}
+
+        {error && (
+
+          <div
+            style={{
+              marginBottom: "20px",
+              padding: "14px 16px",
+              border:
+                "1px solid rgba(130, 74, 60, 0.25)",
+              color: "#7c463b"
+            }}
+          >
+
+            {error}
+
+          </div>
+
+        )}
+
+
+
+        {/* ================= PROJECT TABLE ================= */}
 
         <section className="admin-project-table">
 
+
           <div className="admin-project-table-head">
 
-            <span>PROJECT</span>
-            <span>CLIENT</span>
-            <span>STATUS</span>
-            <span>PROGRESS</span>
-            <span>DUE DATE</span>
-            <span>PRIORITY</span>
-            <span>ACTION</span>
+            <span>
+              PROJECT
+            </span>
+
+            <span>
+              CLIENT
+            </span>
+
+            <span>
+              STATUS
+            </span>
+
+            <span>
+              PROGRESS
+            </span>
+
+            <span>
+              DUE DATE
+            </span>
+
+            <span>
+              PRIORITY
+            </span>
+
+            <span>
+              ACTION
+            </span>
 
           </div>
 
 
+
           <div className="admin-project-list">
 
-            {filteredProjects.length > 0 ? (
 
-              filteredProjects.map((project) => (
+            {/* LOADING */}
 
-                <article
-                  className="admin-project-row"
-                  key={project.id}
-                >
+            {loading ? (
 
+              <div className="admin-project-empty">
 
-                  {/* PROJECT */}
+                <span>
+                  ...
+                </span>
 
-                  <div className="admin-project-name">
+                <h3>
+                  Loading projects.
+                </h3>
 
-                    <strong>
-                      {project.title}
-                    </strong>
+                <p>
+                  Fetching active FALDREN
+                  projects.
+                </p>
 
-                    <span>
-                      {project.category}
-                    </span>
+              </div>
 
-                  </div>
-
-
-
-                  {/* CLIENT */}
-
-                  <div className="admin-project-client">
-                    {project.clientName}
-                  </div>
+            ) : filteredProjects.length >
+              0 ? (
 
 
+              /* ================= REAL PROJECTS ================= */
 
-                  {/* STATUS */}
+              filteredProjects.map(
+                (project) => (
 
-                  <div>
-
-                    <span
-                      className={
-                        `admin-project-status ${project.status.toLowerCase()}`
-                      }
-                    >
-
-                      <i />
-
-                      {formatStatus(project.status)}
-
-                    </span>
-
-                  </div>
+                  <article
+                    className="admin-project-row"
+                    key={project.id}
+                  >
 
 
+                    {/* PROJECT */}
 
-                  {/* PROGRESS */}
-
-                  <div className="admin-project-progress">
-
-                    <div className="admin-project-progress-copy">
-
-                      <span>
-                        Progress
-                      </span>
+                    <div className="admin-project-name">
 
                       <strong>
-                        {project.progress}%
+                        {project.title}
                       </strong>
 
+                      <span>
+
+                        {
+                          project.serviceType ||
+                          "Project"
+                        }
+
+                      </span>
+
                     </div>
 
 
-                    <div className="admin-progress-track">
+
+                    {/* CLIENT */}
+
+                    <div className="admin-project-client">
+
+                      <strong>
+
+                        {getClientDisplay(
+                          project
+                        )}
+
+                      </strong>
+
+
+                      {project.clientCompany &&
+                        project.clientFullName && (
+
+                        <span
+                          style={{
+                            display: "block",
+                            marginTop: "3px",
+                            fontSize: "10px",
+                            opacity: 0.65
+                          }}
+                        >
+
+                          {
+                            project
+                              .clientFullName
+                          }
+
+                        </span>
+
+                      )}
+
+                    </div>
+
+
+
+                    {/* STATUS */}
+
+                    <div>
 
                       <span
-                        style={{
-                          width: `${project.progress}%`
-                        }}
-                      />
+                        className={
+                          `admin-project-status ${
+                            (
+                              project.status ||
+                              "PLANNING"
+                            ).toLowerCase()
+                          }`
+                        }
+                      >
+
+                        <i />
+
+                        {formatStatus(
+                          project.status
+                        )}
+
+                      </span>
 
                     </div>
 
-                  </div>
+
+
+                    {/* PROGRESS */}
+
+                    <div className="admin-project-progress">
+
+                      <div className="admin-project-progress-copy">
+
+                        <span>
+                          Progress
+                        </span>
+
+                        <strong>
+
+                          {
+                            project.progress ??
+                            0
+                          }%
+
+                        </strong>
+
+                      </div>
+
+
+                      <div className="admin-progress-track">
+
+                        <span
+                          style={{
+                            width:
+                              `${Math.min(
+                                Math.max(
+                                  project.progress ??
+                                  0,
+                                  0
+                                ),
+                                100
+                              )}%`
+                          }}
+                        />
+
+                      </div>
+
+                    </div>
 
 
 
-                  {/* DUE DATE */}
+                    {/* DUE DATE */}
 
-                  <div className="admin-project-date">
+                    <div className="admin-project-date">
 
-                    <CalendarDays
-                      size={14}
-                      strokeWidth={1.5}
-                    />
-
-                    <span>
-                      {project.dueDate}
-                    </span>
-
-                  </div>
-
-
-
-                  {/* PRIORITY */}
-
-                  <div>
-
-                    <span
-                      className={
-                        `admin-project-priority ${project.priority.toLowerCase()}`
-                      }
-                    >
-                      {project.priority}
-                    </span>
-
-                  </div>
-
-
-
-                  {/* ACTION */}
-
-                  <div className="admin-project-menu">
-
-                    <button
-                      type="button"
-                      aria-label="Project actions"
-                    >
-
-                      <MoreHorizontal
-                        size={19}
-                        strokeWidth={1.6}
+                      <CalendarDays
+                        size={14}
+                        strokeWidth={1.5}
                       />
 
-                    </button>
+                      <span>
 
-                  </div>
+                        {formatDate(
+                          project.dueDate
+                        )}
 
-                </article>
+                      </span>
 
-              ))
+                    </div>
+
+
+
+                    {/* PRIORITY */}
+
+                    <div>
+
+                      <span
+                        className={
+                          `admin-project-priority ${
+                            (
+                              project.priority ||
+                              "MEDIUM"
+                            ).toLowerCase()
+                          }`
+                        }
+                      >
+
+                        {
+                          project.priority ||
+                          "MEDIUM"
+                        }
+
+                      </span>
+
+                    </div>
+
+
+
+                    {/* ACTION */}
+
+                    <div className="admin-project-menu">
+
+                      <button
+                        type="button"
+                        aria-label="Project actions"
+                        title="Project editing will be added next"
+                      >
+
+                        <MoreHorizontal
+                          size={19}
+                          strokeWidth={1.6}
+                        />
+
+                      </button>
+
+                    </div>
+
+                  </article>
+
+                )
+              )
 
             ) : (
+
+              /* ================= EMPTY ================= */
 
               <div className="admin-project-empty">
 
@@ -434,7 +853,13 @@ function AdminProjects() {
                 </h3>
 
                 <p>
-                  Try another search or status filter.
+
+                  {projects.length === 0
+
+                    ? "Accepted client projects will appear here."
+
+                    : "Try another search or status filter."}
+
                 </p>
 
               </div>
@@ -452,5 +877,6 @@ function AdminProjects() {
   );
 
 }
+
 
 export default AdminProjects;

@@ -36,6 +36,7 @@ import AdminDashboard from './admin/pages/AdminDashboard';
 import AdminClients from './admin/pages/AdminClients';
 import AdminProjects from './admin/pages/AdminProjects';
 import ProtectedAdminRoute from './admin/components/ProtectedAdminRoute';
+import ProtectedClientRoute from "./pages/client/ProtectedClientRoute";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -3079,34 +3080,20 @@ ReactDOM
 <Route
   path="/client/dashboard"
   element={
-    <ClientDashboard
-      onLogout={() => {
+    <ProtectedClientRoute>
+      <ClientDashboard
+        onLogout={() => {
 
-        localStorage.removeItem(
-          "clientToken"
-        );
+          localStorage.removeItem("clientToken");
+          localStorage.removeItem("clientName");
+          localStorage.removeItem("clientEmail");
+          localStorage.removeItem("clientCompany");
+          localStorage.removeItem("clientRole");
 
-        localStorage.removeItem(
-          "clientName"
-        );
-
-        localStorage.removeItem(
-          "clientEmail"
-        );
-
-        localStorage.removeItem(
-          "clientCompany"
-        );
-
-        localStorage.removeItem(
-          "clientRole"
-        );
-
-        window.location.href =
-          "/login";
-
-      }}
-    />
+          window.location.href = "/login";
+        }}
+      />
+    </ProtectedClientRoute>
   }
 />
 

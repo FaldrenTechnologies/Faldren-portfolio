@@ -993,3 +993,275 @@
   }
 
 }
+
+/* =====================================================
+   CLIENT PROJECT REQUEST
+===================================================== */
+
+.client-project-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.client-add-project {
+  border: 1px solid rgba(25, 26, 22, 0.18);
+  background: #191a16;
+  color: #f5f0e6;
+  padding: 13px 20px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.client-add-project:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.client-project-form-wrap {
+  margin-bottom: 38px;
+  padding: 28px;
+  background: #f3eee4;
+  border: 1px solid rgba(25, 26, 22, 0.12);
+}
+
+.client-project-form-head {
+  margin-bottom: 28px;
+}
+
+.client-project-form-head span {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: #716d64;
+}
+
+.client-project-form-head h3 {
+  margin: 0 0 9px;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 500;
+  color: #191a16;
+}
+
+.client-project-form-head p {
+  margin: 0;
+  max-width: 600px;
+  color: #716d64;
+  line-height: 1.6;
+}
+
+.client-project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.client-project-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.client-project-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.client-project-field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #50523e;
+}
+
+.client-project-field input,
+.client-project-field select,
+.client-project-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(25, 26, 22, 0.15);
+  background: #f8f3e9;
+  color: #191a16;
+  padding: 13px 14px;
+  outline: none;
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 0.2s ease;
+}
+
+.client-project-field textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.client-project-field input:focus,
+.client-project-field select:focus,
+.client-project-field textarea:focus {
+  border-color: #686a52;
+}
+
+.client-project-submit-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.client-project-cancel,
+.client-project-submit {
+  border: 0;
+  padding: 13px 20px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+
+.client-project-cancel {
+  background: transparent;
+  border: 1px solid rgba(25, 26, 22, 0.15);
+  color: #191a16;
+}
+
+.client-project-submit {
+  background: #191a16;
+  color: #f5f0e6;
+}
+
+.client-project-submit:disabled,
+.client-project-cancel:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.client-project-success {
+  margin-bottom: 22px;
+  padding: 14px 16px;
+  border: 1px solid rgba(80, 82, 62, 0.25);
+  background: rgba(104, 106, 82, 0.09);
+  color: #50523e;
+  font-size: 12px;
+}
+
+.client-project-error {
+  margin-bottom: 22px;
+  padding: 14px 16px;
+  border: 1px solid rgba(130, 74, 60, 0.25);
+  background: rgba(130, 74, 60, 0.08);
+  color: #7c463b;
+  font-size: 12px;
+}
+
+.client-project-group {
+  margin-top: 34px;
+}
+
+.client-project-group-title {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 13px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(25, 26, 22, 0.12);
+}
+
+.client-project-group-title span {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: #716d64;
+}
+
+.client-project-group-title strong {
+  font-size: 11px;
+}
+
+.client-project-empty {
+  padding: 20px 0;
+  color: #716d64;
+  font-size: 13px;
+}
+
+.client-request-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.client-request-card {
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(25, 26, 22, 0.11);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.client-request-card h3 {
+  margin: 7px 0 4px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.client-request-card p {
+  margin: 0;
+  color: #716d64;
+  font-size: 12px;
+}
+
+.client-request-status {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  padding: 5px 8px;
+  border: 1px solid rgba(25, 26, 22, 0.12);
+}
+
+.client-request-status.pending {
+  color: #806956;
+}
+
+.client-request-status.accepted {
+  color: #50523e;
+}
+
+.client-request-status.rejected {
+  color: #8a5145;
+}
+
+.client-request-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  color: #716d64;
+  font-size: 11px;
+}
+
+@media (max-width: 700px) {
+  .client-project-toolbar {
+    flex-direction: column;
+  }
+
+  .client-project-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .client-request-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .client-request-meta {
+    align-items: flex-start;
+  }
+
+  .client-project-submit-row {
+    flex-direction: column-reverse;
+  }
+
+  .client-project-submit,
+  .client-project-cancel {
+    width: 100%;
+  }
+}

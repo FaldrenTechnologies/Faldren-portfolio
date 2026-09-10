@@ -1,4 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState
+} from "react";
 
 import {
   Search,
@@ -13,52 +17,14 @@ import AdminSidebar from "../components/AdminSidebar";
 import "../admin.css";
 
 
-const INITIAL_REQUESTS = [
-  {
-    id: 1,
-    clientName: "Freddy Joshwa",
-    companyName: "FJ Studio",
-    email: "freddy@example.com",
-    service: "Website",
-    budget: "₹25,000 – ₹50,000",
-    description:
-      "We need a modern portfolio website with responsive design, project showcase and enquiry flow.",
-    status: "PENDING",
-    createdAt: "2026-09-08"
-  },
-
-  {
-    id: 2,
-    clientName: "Hariesh Kumar",
-    companyName: "HK Technologies",
-    email: "hariesh@example.com",
-    service: "Web Application",
-    budget: "₹50,000 – ₹1,00,000",
-    description:
-      "Looking for a business dashboard to manage internal operations and reports.",
-    status: "PENDING",
-    createdAt: "2026-09-09"
-  },
-
-  {
-    id: 3,
-    clientName: "Manesh Kumar",
-    companyName: "Best Auto Consultancy",
-    email: "manesh@example.com",
-    service: "Website",
-    budget: "Under ₹25,000",
-    description:
-      "Need a simple professional company website for our consultancy business.",
-    status: "ACCEPTED",
-    createdAt: "2026-09-05"
-  }
-];
+const API_BASE =
+  "http://localhost:8080";
 
 
 function AdminRequests() {
 
   const [requests, setRequests] =
-    useState(INITIAL_REQUESTS);
+    useState([]);
 
   const [search, setSearch] =
     useState("");
@@ -69,50 +35,216 @@ function AdminRequests() {
   const [selectedRequest, setSelectedRequest] =
     useState(null);
 
+  const [loading, setLoading] =
+    useState(true);
 
-  const filteredRequests = useMemo(() => {
+  const [error, setError] =
+    useState("");
 
-    const value =
-      search.trim().toLowerCase();
-
-
-    return requests.filter((request) => {
-
-      const matchesSearch =
-        request.clientName
-          .toLowerCase()
-          .includes(value) ||
-
-        request.companyName
-          .toLowerCase()
-          .includes(value) ||
-
-        request.service
-          .toLowerCase()
-          .includes(value) ||
-
-        request.email
-          .toLowerCase()
-          .includes(value);
+  const [actionLoading, setActionLoading] =
+    useState(null);
 
 
-      const matchesStatus =
-        statusFilter === "ALL" ||
-        request.status === statusFilter;
+  const adminName =
+    localStorage.getItem("adminName") ||
+    "Administrator";
 
 
-      return (
-        matchesSearch &&
-        matchesStatus
+  // ==========================================
+  // LOAD REQUESTS FROM BACKEND
+  // ==========================================
+
+  const loadRequests = async () => {
+
+    const token =
+      localStorage.getItem(
+        "adminToken"
       );
 
-    });
 
-  }, [
-    requests,
-    search,
-    statusFilter
-  ]);
+    if (!token) {
+
+      window.location.href =
+        "/admin/login";
+
+      return;
+    }
+
+
+    try {
+
+      setLoading(true);
+      setError("");
+
+
+      const response =
+        await fetch(
+          `${API_BASE}/api/admin/project-requests`,
+          {
+            method: "GET",
+
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        );
+
+
+      if (
+        response.status === 401 ||
+        response.status === 403
+      ) {
+
+        localStorage.removeItem(
+          "adminToken"
+        );
+
+        localStorage.removeItem(
+          "adminName"
+        );
+
+        localStorage.removeItem(
+          "adminEmail"
+        );
+
+        localStorage.removeItem(
+          "adminRole"
+        );
+
+
+        window.location.href =
+          "/admin/login";
+
+        return;
+      }
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        setError(
+          data.message ||
+          "Unable to load project requests."
+        );
+
+        return;
+      }
+
+
+      setRequests(
+        Array.isArray(data)
+          ? data
+          : []
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Request loading error:",
+        error
+      );
+
+
+      setError(
+        "Unable to connect to the backend."
+      );
+
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+  useEffect(() => {
+
+    loadRequests();
+
+  }, []);
+
+
+  // ==========================================
+  // SEARCH + FILTER
+  // ==========================================
+
+  const filteredRequests =
+    useMemo(() => {
+
+      const value =
+        search
+          .trim()
+          .toLowerCase();
+
+
+      return requests.filter(
+        (request) => {
+
+          const clientName =
+            request.clientFullName || "";
+
+          const companyName =
+            request.clientCompany || "";
+
+          const email =
+            request.clientEmail || "";
+
+          const service =
+            request.serviceType || "";
+
+          const projectName =
+            request.projectName || "";
+
+
+          const matchesSearch =
+
+            clientName
+              .toLowerCase()
+              .includes(value) ||
+
+            companyName
+              .toLowerCase()
+              .includes(value) ||
+
+            email
+              .toLowerCase()
+              .includes(value) ||
+
+            service
+              .toLowerCase()
+              .includes(value) ||
+
+            projectName
+              .toLowerCase()
+              .includes(value);
+
+
+          const matchesStatus =
+            statusFilter === "ALL" ||
+            request.status ===
+              statusFilter;
+
+
+          return (
+            matchesSearch &&
+            matchesStatus
+          );
+
+        }
+      );
+
+    }, [
+      requests,
+      search,
+      statusFilter
+    ]);
 
 
   const pendingCount =
@@ -122,49 +254,214 @@ function AdminRequests() {
     ).length;
 
 
-  const updateRequestStatus = (
-    id,
-    status
-  ) => {
+  // ==========================================
+  // DATE FORMAT
+  // ==========================================
 
-    setRequests((current) =>
+  const formatDate =
+    (date) => {
 
-      current.map((request) =>
-
-        request.id === id
-
-          ? {
-              ...request,
-              status
-            }
-
-          : request
-
-      )
-
-    );
+      if (!date) {
+        return "—";
+      }
 
 
-    setSelectedRequest((current) => {
+      const parsedDate =
+        new Date(date);
+
 
       if (
-        current &&
-        current.id === id
+        Number.isNaN(
+          parsedDate.getTime()
+        )
       ) {
+        return date;
+      }
 
-        return {
-          ...current,
-          status
-        };
+
+      return parsedDate
+        .toLocaleDateString(
+          "en-IN",
+          {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          }
+        );
+
+    };
+
+
+  // ==========================================
+  // ACCEPT / REJECT
+  // ==========================================
+
+  const updateRequestStatus =
+    async (
+      request,
+      action
+    ) => {
+
+      const token =
+        localStorage.getItem(
+          "adminToken"
+        );
+
+
+      if (!token) {
+
+        window.location.href =
+          "/admin/login";
+
+        return;
+      }
+
+
+      setActionLoading(
+        `${request.id}-${action}`
+      );
+
+      setError("");
+
+
+      try {
+
+        const response =
+          await fetch(
+            `${API_BASE}/api/admin/project-requests/${request.id}/${action}`,
+            {
+              method: "PATCH",
+
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+
+          localStorage.removeItem(
+            "adminToken"
+          );
+
+          localStorage.removeItem(
+            "adminRole"
+          );
+
+
+          window.location.href =
+            "/admin/login";
+
+          return;
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          setError(
+            data.message ||
+            `Unable to ${action} request.`
+          );
+
+          return;
+        }
+
+
+        // Update UI immediately
+
+        setRequests(
+          (current) =>
+            current.map(
+              (item) =>
+
+                item.id ===
+                request.id
+
+                  ? {
+                      ...item,
+
+                      status:
+                        action ===
+                        "accept"
+                          ? "ACCEPTED"
+                          : "REJECTED"
+                    }
+
+                  : item
+            )
+        );
+
+
+        // Update drawer if open
+
+        setSelectedRequest(
+          (current) => {
+
+            if (
+              !current ||
+              current.id !==
+                request.id
+            ) {
+
+              return current;
+            }
+
+
+            return {
+              ...current,
+
+              status:
+                action ===
+                "accept"
+                  ? "ACCEPTED"
+                  : "REJECTED"
+            };
+
+          }
+        );
+
+
+        // Also refresh from DB
+
+        await loadRequests();
+
+
+      } catch (error) {
+
+        console.error(
+          "Request action error:",
+          error
+        );
+
+
+        setError(
+          "Unable to connect to the backend."
+        );
+
+
+      } finally {
+
+        setActionLoading(
+          null
+        );
 
       }
 
-      return current;
+    };
 
-    });
 
-  };
-
+  // ==========================================
+  // UI
+  // ==========================================
 
   return (
 
@@ -176,7 +473,7 @@ function AdminRequests() {
       <main className="admin-main">
 
 
-        {/* TOPBAR */}
+        {/* ================= TOPBAR ================= */}
 
         <header className="admin-topbar">
 
@@ -198,7 +495,7 @@ function AdminRequests() {
             <div className="admin-profile-copy">
 
               <strong>
-                Administrator
+                {adminName}
               </strong>
 
               <span>
@@ -207,8 +504,13 @@ function AdminRequests() {
 
             </div>
 
+
             <div className="admin-avatar">
-              A
+
+              {adminName
+                .charAt(0)
+                .toUpperCase()}
+
             </div>
 
           </div>
@@ -217,7 +519,7 @@ function AdminRequests() {
 
 
 
-        {/* INTRO */}
+        {/* ================= INTRO ================= */}
 
         <section className="admin-requests-intro">
 
@@ -228,11 +530,14 @@ function AdminRequests() {
             </span>
 
             <h2>
+
               New ideas
               <br />
+
               <em>
                 arrive here.
               </em>
+
             </h2>
 
             <p>
@@ -250,12 +555,14 @@ function AdminRequests() {
             </span>
 
             <strong>
+
               {String(
                 pendingCount
               ).padStart(
                 2,
                 "0"
               )}
+
             </strong>
 
           </div>
@@ -264,7 +571,7 @@ function AdminRequests() {
 
 
 
-        {/* SEARCH + FILTER */}
+        {/* ================= SEARCH + FILTER ================= */}
 
         <section className="admin-request-actions">
 
@@ -277,12 +584,13 @@ function AdminRequests() {
 
             <input
               type="text"
-              placeholder="Search requests..."
+              placeholder="Search client or project..."
               value={search}
-              onChange={(event) =>
-                setSearch(
-                  event.target.value
-                )
+              onChange={
+                (event) =>
+                  setSearch(
+                    event.target.value
+                  )
               }
             />
 
@@ -292,10 +600,11 @@ function AdminRequests() {
           <select
             className="admin-request-filter"
             value={statusFilter}
-            onChange={(event) =>
-              setStatusFilter(
-                event.target.value
-              )
+            onChange={
+              (event) =>
+                setStatusFilter(
+                  event.target.value
+                )
             }
           >
 
@@ -321,7 +630,27 @@ function AdminRequests() {
 
 
 
-        {/* TABLE */}
+        {/* ================= ERROR ================= */}
+
+        {error && (
+
+          <div
+            style={{
+              marginBottom: "20px",
+              padding: "14px 16px",
+              border:
+                "1px solid rgba(130, 74, 60, .25)",
+              color: "#7c463b"
+            }}
+          >
+            {error}
+          </div>
+
+        )}
+
+
+
+        {/* ================= TABLE ================= */}
 
         <section className="admin-request-table">
 
@@ -356,7 +685,28 @@ function AdminRequests() {
 
           <div className="admin-request-list">
 
-            {filteredRequests.length > 0 ? (
+
+            {loading ? (
+
+              <div className="admin-request-empty">
+
+                <span>
+                  ...
+                </span>
+
+                <h3>
+                  Loading requests.
+                </h3>
+
+                <p>
+                  Fetching project requests
+                  from FALDREN.
+                </p>
+
+              </div>
+
+            ) : filteredRequests.length >
+              0 ? (
 
               filteredRequests.map(
                 (request) => (
@@ -373,7 +723,8 @@ function AdminRequests() {
 
                       <div className="admin-request-avatar">
 
-                        {request.clientName
+                        {(request.clientFullName ||
+                          "C")
                           .charAt(0)
                           .toUpperCase()}
 
@@ -383,11 +734,20 @@ function AdminRequests() {
                       <div>
 
                         <strong>
-                          {request.clientName}
+                          {
+                            request
+                              .clientFullName
+                          }
                         </strong>
 
                         <span>
-                          {request.companyName}
+
+                          {
+                            request
+                              .clientCompany ||
+                            "Individual Client"
+                          }
+
                         </span>
 
                       </div>
@@ -400,7 +760,10 @@ function AdminRequests() {
 
                     <div className="admin-request-service">
 
-                      {request.service}
+                      {
+                        request
+                          .serviceType
+                      }
 
                     </div>
 
@@ -410,13 +773,16 @@ function AdminRequests() {
 
                     <div className="admin-request-budget">
 
-                      {request.budget}
+                      {
+                        request
+                          .budgetRange
+                      }
 
                     </div>
 
 
 
-                    {/* DATE */}
+                    {/* RECEIVED */}
 
                     <div className="admin-request-date">
 
@@ -425,7 +791,9 @@ function AdminRequests() {
                         strokeWidth={1.5}
                       />
 
-                      {request.createdAt}
+                      {formatDate(
+                        request.createdAt
+                      )}
 
                     </div>
 
@@ -437,7 +805,13 @@ function AdminRequests() {
 
                       <span
                         className={
-                          `admin-request-status ${request.status.toLowerCase()}`
+                          `admin-request-status ${
+                            (
+                              request.status ||
+                              "PENDING"
+                            )
+                              .toLowerCase()
+                          }`
                         }
                       >
 
@@ -475,17 +849,22 @@ function AdminRequests() {
                       </button>
 
 
-                      {request.status === "PENDING" && (
+                      {request.status ===
+                        "PENDING" && (
 
                         <>
 
                           <button
                             type="button"
                             className="admin-request-accept"
+                            disabled={
+                              actionLoading !==
+                              null
+                            }
                             onClick={() =>
                               updateRequestStatus(
-                                request.id,
-                                "ACCEPTED"
+                                request,
+                                "accept"
                               )
                             }
                             aria-label="Accept request"
@@ -502,10 +881,14 @@ function AdminRequests() {
                           <button
                             type="button"
                             className="admin-request-reject"
+                            disabled={
+                              actionLoading !==
+                              null
+                            }
                             onClick={() =>
                               updateRequestStatus(
-                                request.id,
-                                "REJECTED"
+                                request,
+                                "reject"
                               )
                             }
                             aria-label="Reject request"
@@ -558,41 +941,55 @@ function AdminRequests() {
 
 
 
-      {/* REQUEST DETAILS */}
+      {/* =================================================
+          REQUEST DETAILS DRAWER
+      ================================================= */}
 
       {selectedRequest && (
 
         <div
           className="admin-request-modal-backdrop"
           onClick={() =>
-            setSelectedRequest(null)
+            setSelectedRequest(
+              null
+            )
           }
         >
 
           <aside
             className="admin-request-drawer"
-            onClick={(event) =>
-              event.stopPropagation()
+            onClick={
+              (event) =>
+                event.stopPropagation()
             }
           >
+
 
             <div className="admin-request-drawer-head">
 
               <div>
 
                 <span>
-                  REQUEST /
-                  {" "}
+
+                  REQUEST /{" "}
+
                   {String(
                     selectedRequest.id
                   ).padStart(
                     3,
                     "0"
                   )}
+
                 </span>
 
+
                 <h2>
-                  Project request
+
+                  {
+                    selectedRequest
+                      .projectName
+                  }
+
                 </h2>
 
               </div>
@@ -601,7 +998,9 @@ function AdminRequests() {
               <button
                 type="button"
                 onClick={() =>
-                  setSelectedRequest(null)
+                  setSelectedRequest(
+                    null
+                  )
                 }
               >
 
@@ -613,11 +1012,15 @@ function AdminRequests() {
 
 
 
+            {/* CLIENT */}
+
             <div className="admin-request-detail-client">
 
               <div className="admin-request-detail-avatar">
 
-                {selectedRequest.clientName
+                {(selectedRequest
+                  .clientFullName ||
+                  "C")
                   .charAt(0)
                   .toUpperCase()}
 
@@ -627,11 +1030,20 @@ function AdminRequests() {
               <div>
 
                 <h3>
-                  {selectedRequest.clientName}
+                  {
+                    selectedRequest
+                      .clientFullName
+                  }
                 </h3>
 
                 <p>
-                  {selectedRequest.companyName}
+
+                  {
+                    selectedRequest
+                      .clientCompany ||
+                    "Individual Client"
+                  }
+
                 </p>
 
               </div>
@@ -640,7 +1052,10 @@ function AdminRequests() {
 
 
 
+            {/* BASIC DETAILS */}
+
             <div className="admin-request-detail-grid">
+
 
               <div>
 
@@ -649,7 +1064,10 @@ function AdminRequests() {
                 </span>
 
                 <strong>
-                  {selectedRequest.service}
+                  {
+                    selectedRequest
+                      .serviceType
+                  }
                 </strong>
 
               </div>
@@ -662,7 +1080,10 @@ function AdminRequests() {
                 </span>
 
                 <strong>
-                  {selectedRequest.budget}
+                  {
+                    selectedRequest
+                      .budgetRange
+                  }
                 </strong>
 
               </div>
@@ -671,11 +1092,16 @@ function AdminRequests() {
               <div>
 
                 <span>
-                  RECEIVED
+                  EXPECTED DEADLINE
                 </span>
 
                 <strong>
-                  {selectedRequest.createdAt}
+
+                  {formatDate(
+                    selectedRequest
+                      .expectedDeadline
+                  )}
+
                 </strong>
 
               </div>
@@ -688,7 +1114,10 @@ function AdminRequests() {
                 </span>
 
                 <strong>
-                  {selectedRequest.status}
+                  {
+                    selectedRequest
+                      .status
+                  }
                 </strong>
 
               </div>
@@ -697,6 +1126,8 @@ function AdminRequests() {
 
 
 
+            {/* PROJECT DESCRIPTION */}
+
             <div className="admin-request-description">
 
               <span>
@@ -704,17 +1135,131 @@ function AdminRequests() {
               </span>
 
               <p>
-                {selectedRequest.description}
+                {
+                  selectedRequest
+                    .description
+                }
               </p>
 
             </div>
 
 
 
+            {/* REQUIREMENTS */}
+
+            <div className="admin-request-description">
+
+              <span>
+                MAIN REQUIREMENTS / FEATURES
+              </span>
+
+              <p
+                style={{
+                  whiteSpace:
+                    "pre-wrap"
+                }}
+              >
+                {
+                  selectedRequest
+                    .requirements
+                }
+              </p>
+
+            </div>
+
+
+
+            {/* BUSINESS GOAL */}
+
+            <div className="admin-request-description">
+
+              <span>
+                BUSINESS GOAL
+              </span>
+
+              <p
+                style={{
+                  whiteSpace:
+                    "pre-wrap"
+                }}
+              >
+                {
+                  selectedRequest
+                    .businessGoal
+                }
+              </p>
+
+            </div>
+
+
+
+            {/* REFERENCES */}
+
+            {selectedRequest
+              .referenceLinks && (
+
+              <div className="admin-request-description">
+
+                <span>
+                  REFERENCES / INSPIRATION
+                </span>
+
+                <p
+                  style={{
+                    whiteSpace:
+                      "pre-wrap"
+                  }}
+                >
+                  {
+                    selectedRequest
+                      .referenceLinks
+                  }
+                </p>
+
+              </div>
+
+            )}
+
+
+
+            {/* NOTES */}
+
+            {selectedRequest
+              .additionalNotes && (
+
+              <div className="admin-request-description">
+
+                <span>
+                  ADDITIONAL NOTES
+                </span>
+
+                <p
+                  style={{
+                    whiteSpace:
+                      "pre-wrap"
+                  }}
+                >
+                  {
+                    selectedRequest
+                      .additionalNotes
+                  }
+                </p>
+
+              </div>
+
+            )}
+
+
+
+            {/* CONTACT EMAIL */}
+
             <a
               className="admin-request-contact"
               href={
-                `mailto:${selectedRequest.email}`
+                `mailto:${
+                  selectedRequest
+                    .clientEmail
+                }`
               }
             >
 
@@ -723,30 +1268,73 @@ function AdminRequests() {
                 strokeWidth={1.6}
               />
 
-              {selectedRequest.email}
+              {
+                selectedRequest
+                  .clientEmail
+              }
 
             </a>
 
 
 
-            {selectedRequest.status === "PENDING" && (
+            {/* PHONE */}
+
+            {selectedRequest
+              .clientPhone && (
+
+              <div
+                className="admin-request-description"
+                style={{
+                  marginTop:
+                    "18px"
+                }}
+              >
+
+                <span>
+                  PHONE
+                </span>
+
+                <p>
+                  {
+                    selectedRequest
+                      .clientPhone
+                  }
+                </p>
+
+              </div>
+
+            )}
+
+
+
+            {/* ACCEPT / REJECT */}
+
+            {selectedRequest.status ===
+              "PENDING" && (
 
               <div className="admin-request-drawer-actions">
 
                 <button
                   type="button"
                   className="admin-request-drawer-reject"
+                  disabled={
+                    actionLoading !==
+                    null
+                  }
                   onClick={() =>
                     updateRequestStatus(
-                      selectedRequest.id,
-                      "REJECTED"
+                      selectedRequest,
+                      "reject"
                     )
                   }
                 >
 
                   <X size={16} />
 
-                  Reject
+                  {actionLoading ===
+                    `${selectedRequest.id}-reject`
+                    ? "Rejecting..."
+                    : "Reject"}
 
                 </button>
 
@@ -754,17 +1342,24 @@ function AdminRequests() {
                 <button
                   type="button"
                   className="admin-request-drawer-accept"
+                  disabled={
+                    actionLoading !==
+                    null
+                  }
                   onClick={() =>
                     updateRequestStatus(
-                      selectedRequest.id,
-                      "ACCEPTED"
+                      selectedRequest,
+                      "accept"
                     )
                   }
                 >
 
                   <Check size={16} />
 
-                  Accept request
+                  {actionLoading ===
+                    `${selectedRequest.id}-accept`
+                    ? "Accepting..."
+                    : "Accept request"}
 
                 </button>
 
@@ -783,5 +1378,6 @@ function AdminRequests() {
   );
 
 }
+
 
 export default AdminRequests;
