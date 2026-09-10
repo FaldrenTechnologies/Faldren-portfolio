@@ -23,14 +23,17 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  Navigate
+  Navigate,
+  useNavigate
 } from 'react-router-dom';
 
 import AdminLogin from './admin/pages/AdminLogin';
 import AdminDashboard from './admin/pages/AdminDashboard';
 import AdminClients from './admin/pages/AdminClients';
 import ProtectedAdminRoute from './admin/components/ProtectedAdminRoute';
-
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import ClientDashboard from './pages/client/ClientDashboard';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -163,7 +166,9 @@ const whyFaldren = [
 ========================================================= */
 
 function App() {
+  const navigate = useNavigate();
 
+  // existing code...
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [submitted, setSubmitted] = React.useState(false);
 
@@ -2286,19 +2291,12 @@ viewport.removeEventListener(
 
 
             <button
-              className="nav-cta magnetic"
-              onClick={() =>
-                go('contact')
-              }
-            >
-
-              Start a project
-
-              <ArrowUpRight
-                size={15}
-              />
-
-            </button>
+  className="nav-cta magnetic"
+  onClick={() => navigate("/login")}
+>
+  Start a project
+  <ArrowUpRight size={15} />
+</button>
 
           </div>
 
@@ -2355,7 +2353,7 @@ viewport.removeEventListener(
 
               <button
                 onClick={() =>
-                  go('contact')
+                  go('login')
                 }
               >
                 Start a project
@@ -2440,19 +2438,12 @@ viewport.removeEventListener(
 
 
               <button
-                className="primary-btn magnetic"
-                onClick={() =>
-                  go('contact')
-                }
-              >
-
-                Build with FALDREN
-
-                <MoveRight
-                  size={18}
-                />
-
-              </button>
+  className="primary-btn magnetic"
+  onClick={() => navigate("/login")}
+>
+  START A PROJECT
+  <MoveRight size={18} />
+</button>
 
 
               <button
@@ -2900,336 +2891,70 @@ viewport.removeEventListener(
 
 
         {/* =================================================
-            CONTACT
-        ================================================= */}
+    CONTACT
+================================================= */}
 
-        <section
-          id="contact"
-          className="contact-section"
-        >
+<section
+  id="contact"
+  className="contact-section"
+>
+  <div className="container contact-center">
 
-          <div className="container contact-layout">
+    <div className="contact-copy contact-copy-center">
 
+      <div className="section-kicker light">
+        Start a project
+      </div>
 
-            <div className="contact-copy">
+      <h2 className="contact-title">
 
+        <span className="contact-title-line">
+          <span>Have something</span>
+        </span>
 
-              <div className="section-kicker light">
-                Start a project
-              </div>
+        <span className="contact-title-line">
+          <span>worth building?</span>
+        </span>
 
+      </h2>
 
-              <h2 className="contact-title">
+      <p className="contact-description">
+        Tell us what you're working on. We'll understand the idea,
+        your requirements and how FALDREN can help bring it to life.
+      </p>
 
-                <span className="contact-title-line">
-                  <span>Have something</span>
-                </span>
+      <div className="contact-notes">
 
-                <span className="contact-title-line">
-                  <span>worth building?</span>
-                </span>
+        <div className="contact-note">
+          <span>01</span>
+          <p>Share your idea</p>
+        </div>
 
-              </h2>
+        <div className="contact-note">
+          <span>02</span>
+          <p>We understand the requirements</p>
+        </div>
 
+        <div className="contact-note">
+          <span>03</span>
+          <p>We discuss the next step</p>
+        </div>
 
-              <p>
+      </div>
 
-                Tell us what you're working on.
-                We'll understand the idea,
-                your requirements and how
-                FALDREN can help bring it to life.
+      <button
+        className="start-connection-btn magnetic"
+        onClick={() => navigate("/login")}
+      >
+        START CONNECTION
+        <ArrowUpRight size={17} />
+      </button>
 
-              </p>
+    </div>
 
-
-              <div className="contact-notes">
-
-
-                <div className="contact-note">
-
-                  <span>01</span>
-
-                  <p>
-                    Share your idea
-                  </p>
-
-                </div>
-
-
-                <div className="contact-note">
-
-                  <span>02</span>
-
-                  <p>
-                    We understand the requirements
-                  </p>
-
-                </div>
-
-
-                <div className="contact-note">
-
-                  <span>03</span>
-
-                  <p>
-                    We discuss the next step
-                  </p>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-
-            <div className="project-form-wrap">
-
-
-              {submitted ? (
-
-                <div className="form-success">
-
-                  <div className="success-icon">
-                    <Check size={28} />
-                  </div>
-
-                  <h3>
-                    Thanks.
-                  </h3>
-
-                  <p>
-                    We've received your project enquiry.
-                    We'll get back to you shortly.
-                  </p>
-
-                </div>
-
-              ) : (
-
-                <form
-                  className="project-form"
-                  onSubmit={handleSubmit}
-                >
-
-
-                  <div className="form-row">
-
-                    <div className="form-field">
-
-                      <label>
-                        Name *
-                      </label>
-
-                      <input
-                        type="text"
-                        name="name"
-                        placeholder="Your name"
-                        required
-                      />
-
-                    </div>
-
-
-                    <div className="form-field">
-
-                      <label>
-                        Email *
-                      </label>
-
-                      <input
-                        type="email"
-                        name="email"
-                        placeholder="you@company.com"
-                        required
-                      />
-
-                    </div>
-
-                  </div>
-
-
-
-                  <div className="form-row">
-
-                    <div className="form-field">
-
-                      <label>
-                        Phone
-                      </label>
-
-                      <input
-                        type="tel"
-                        name="phone"
-                        placeholder="+91"
-                      />
-
-                    </div>
-
-
-                    <div className="form-field">
-
-                      <label>
-                        Company / Brand
-                      </label>
-
-                      <input
-                        type="text"
-                        name="company"
-                        placeholder="Optional"
-                      />
-
-                    </div>
-
-                  </div>
-
-
-
-                  <div className="form-field">
-
-                    <label>
-                      What do you need? *
-                    </label>
-
-                    <select
-                      name="service"
-                      defaultValue=""
-                      required
-                    >
-
-                      <option
-                        value=""
-                        disabled
-                      >
-                        Select a service
-                      </option>
-
-                      <option value="website">
-                        Website
-                      </option>
-
-                      <option value="web-app">
-                        Web Application
-                      </option>
-
-                      <option value="software">
-                        Custom Software
-                      </option>
-
-                      <option value="mobile-app">
-                        Mobile Application
-                      </option>
-
-                      <option value="ui-ux">
-                        UI / UX Design
-                      </option>
-
-                      <option value="digital-product">
-                        Digital Product
-                      </option>
-
-                      <option value="other">
-                        Something else
-                      </option>
-
-                    </select>
-
-                  </div>
-
-
-
-                  <div className="form-field">
-
-                    <label>
-                      Project budget
-                    </label>
-
-                    <select
-                      name="budget"
-                      defaultValue=""
-                    >
-
-                      <option value="">
-                        Select budget range
-                      </option>
-
-                      <option value="under-25k">
-                        Under ₹25,000
-                      </option>
-
-                      <option value="25k-50k">
-                        ₹25,000 – ₹50,000
-                      </option>
-
-                      <option value="50k-1l">
-                        ₹50,000 – ₹1,00,000
-                      </option>
-
-                      <option value="1l-plus">
-                        ₹1,00,000+
-                      </option>
-
-                      <option value="discuss">
-                        Let's discuss
-                      </option>
-
-                    </select>
-
-                  </div>
-
-
-
-                  <div className="form-field">
-
-                    <label>
-                      Tell us about your project *
-                    </label>
-
-                    <textarea
-                      name="description"
-                      rows="6"
-                      placeholder="What are you looking to build?"
-                      required
-                    />
-
-                  </div>
-
-
-
-                  <button
-                    type="submit"
-                    className="form-submit magnetic"
-                  >
-
-                    Send project enquiry
-
-                    <ArrowUpRight
-                      size={18}
-                    />
-
-                  </button>
-
-
-                  <p className="form-small">
-
-                    No spam. No unnecessary calls.
-                    Just a conversation about your project.
-
-                  </p>
-
-                </form>
-
-              )}
-
-            </div>
-
-          </div>
-
-        </section>
-
-      </main>
-
-
+  </div>
+</section>
+</main>
 
       {/* ===================================================
           FOOTER
@@ -3301,6 +3026,59 @@ ReactDOM
           path="/"
           element={<App />}
         />
+
+        {/* ================================
+    CLIENT LOGIN
+================================ */}
+
+<Route
+  path="/login"
+  element={
+    <Login
+      onLogin={() => {
+        window.location.href = "/client/dashboard";
+      }}
+      onRegister={() => {
+        window.location.href = "/register";
+      }}
+    />
+  }
+/>
+
+
+{/* ================================
+    CLIENT REGISTER
+================================ */}
+
+<Route
+  path="/register"
+  element={
+    <Register
+      onRegister={() => {
+        window.location.href = "/login";
+      }}
+      onLogin={() => {
+        window.location.href = "/login";
+      }}
+    />
+  }
+/>
+
+
+{/* ================================
+    CLIENT DASHBOARD
+================================ */}
+
+<Route
+  path="/client/dashboard"
+  element={
+    <ClientDashboard
+      onLogout={() => {
+        window.location.href = "/login";
+      }}
+    />
+  }
+/>
 
 
         {/* ================================
