@@ -72,7 +72,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
 
                     .requestMatchers(
-                            "/api/admin/auth/login"
+                            "/api/admin/auth/login",
+                            "/api/client/auth/**"
                     )
                     .permitAll()
 
