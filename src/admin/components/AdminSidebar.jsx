@@ -22,17 +22,8 @@ function AdminSidebar() {
   const location = useLocation();
 
 
-  const goTo = (path) => {
-
-    navigate(path);
-
-  };
-
-
   const isActive = (path) => {
-
     return location.pathname === path;
-
   };
 
 
@@ -48,10 +39,9 @@ function AdminSidebar() {
 
 
   return (
+
     <aside className="admin-sidebar">
 
-
-      {/* BRAND */}
 
       <div>
 
@@ -67,25 +57,30 @@ function AdminSidebar() {
 
 
 
-      {/* MAIN NAVIGATION */}
-
       <nav className="admin-sidebar-nav">
 
 
         <button
+          type="button"
           className={
             `admin-nav-item ${
-              isActive("/admin/dashboard")
+              isActive(
+                "/admin/dashboard"
+              )
                 ? "active"
                 : ""
             }`
           }
           onClick={() =>
-            goTo("/admin/dashboard")
+            navigate(
+              "/admin/dashboard"
+            )
           }
         >
 
-          <LayoutDashboard size={18} />
+          <LayoutDashboard
+            size={18}
+          />
 
           <span>
             Overview
@@ -96,19 +91,26 @@ function AdminSidebar() {
 
 
         <button
+          type="button"
           className={
             `admin-nav-item ${
-              isActive("/admin/clients")
+              isActive(
+                "/admin/clients"
+              )
                 ? "active"
                 : ""
             }`
           }
           onClick={() =>
-            goTo("/admin/clients")
+            navigate(
+              "/admin/clients"
+            )
           }
         >
 
-          <Users size={18} />
+          <Users
+            size={18}
+          />
 
           <span>
             Clients
@@ -119,19 +121,26 @@ function AdminSidebar() {
 
 
         <button
+          type="button"
           className={
             `admin-nav-item ${
-              isActive("/admin/projects")
+              isActive(
+                "/admin/projects"
+              )
                 ? "active"
                 : ""
             }`
           }
           onClick={() =>
-            goTo("/admin/projects")
+            navigate(
+              "/admin/projects"
+            )
           }
         >
 
-          <FolderKanban size={18} />
+          <FolderKanban
+            size={18}
+          />
 
           <span>
             Projects
@@ -142,19 +151,26 @@ function AdminSidebar() {
 
 
         <button
+          type="button"
           className={
             `admin-nav-item ${
-              isActive("/admin/requests")
+              isActive(
+                "/admin/requests"
+              )
                 ? "active"
                 : ""
             }`
           }
           onClick={() =>
-            goTo("/admin/requests")
+            navigate(
+              "/admin/requests"
+            )
           }
         >
 
-          <Inbox size={18} />
+          <Inbox
+            size={18}
+          />
 
           <span>
             Requests
@@ -166,15 +182,16 @@ function AdminSidebar() {
 
 
 
-      {/* BOTTOM */}
-
       <div className="admin-sidebar-bottom">
 
         <button
+          type="button"
           className="admin-nav-item"
         >
 
-          <Settings size={18} />
+          <Settings
+            size={18}
+          />
 
           <span>
             Settings
@@ -184,11 +201,14 @@ function AdminSidebar() {
 
 
         <button
+          type="button"
           className="admin-nav-item"
           onClick={handleLogout}
         >
 
-          <LogOut size={18} />
+          <LogOut
+            size={18}
+          />
 
           <span>
             Logout
@@ -199,7 +219,9 @@ function AdminSidebar() {
       </div>
 
     </aside>
+
   );
+
 }
 
 export default AdminSidebar;

@@ -17,8 +17,6 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 
-import './styles.css';
-
 import {
   BrowserRouter,
   Routes,
@@ -27,13 +25,17 @@ import {
   useNavigate
 } from 'react-router-dom';
 
-import AdminLogin from './admin/pages/AdminLogin';
-import AdminDashboard from './admin/pages/AdminDashboard';
-import AdminClients from './admin/pages/AdminClients';
-import ProtectedAdminRoute from './admin/components/ProtectedAdminRoute';
+import './styles.css';
+
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ClientDashboard from './pages/client/ClientDashboard';
+import AdminRequests from "./admin/pages/AdminRequests";
+import AdminLogin from './admin/pages/AdminLogin';
+import AdminDashboard from './admin/pages/AdminDashboard';
+import AdminClients from './admin/pages/AdminClients';
+import AdminProjects from './admin/pages/AdminProjects';
+import ProtectedAdminRoute from './admin/components/ProtectedAdminRoute';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -2352,9 +2354,10 @@ viewport.removeEventListener(
               </button>
 
               <button
-                onClick={() =>
-                  go('login')
-                }
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate("/login");
+                }}
               >
                 Start a project
               </button>
@@ -3117,6 +3120,24 @@ ReactDOM
             </ProtectedAdminRoute>
           }
         />
+
+        <Route
+  path="/admin/projects"
+  element={
+    <ProtectedAdminRoute>
+      <AdminProjects />
+    </ProtectedAdminRoute>
+  }
+/>
+
+<Route
+  path="/admin/requests"
+  element={
+    <ProtectedAdminRoute>
+      <AdminRequests />
+    </ProtectedAdminRoute>
+  }
+/>
 
 
         {/* ================================
