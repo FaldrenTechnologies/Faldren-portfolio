@@ -30,10 +30,32 @@ function AdminSidebar() {
   const handleLogout = () => {
 
     localStorage.removeItem(
+      "adminToken"
+    );
+
+    localStorage.removeItem(
+      "adminName"
+    );
+
+    localStorage.removeItem(
+      "adminEmail"
+    );
+
+    localStorage.removeItem(
+      "adminRole"
+    );
+
+    localStorage.removeItem(
       "adminLoggedIn"
     );
 
-    navigate("/admin/login");
+
+    navigate(
+      "/admin/login",
+      {
+        replace: true
+      }
+    );
 
   };
 
