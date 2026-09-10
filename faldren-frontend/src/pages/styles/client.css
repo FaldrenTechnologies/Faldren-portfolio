@@ -12,7 +12,7 @@
 
 
 /* =========================================================
-   SIDEBAR
+   SIDEBAR - DARK THEME
 ========================================================= */
 
 .client-sidebar {
@@ -24,7 +24,10 @@
 
   box-sizing: border-box;
 
-  border-right: 1px solid rgba(25, 24, 22, 0.14);
+  background: #13150f;
+  color: #eee9df;
+
+  border-right: 1px solid rgba(238, 233, 223, 0.08);
 
   display: flex;
   flex-direction: column;
@@ -36,7 +39,9 @@
 }
 
 
-/* LOGO */
+/* =========================================================
+   LOGO
+========================================================= */
 
 .client-logo {
   padding: 0 8px;
@@ -49,6 +54,8 @@
   font-weight: 600;
 
   letter-spacing: 0.12em;
+
+  color: #f4efe5;
 }
 
 .client-logo small {
@@ -59,11 +66,15 @@
   font-size: 8px;
   letter-spacing: 0.22em;
 
-  opacity: 0.45;
+  color: #8e8f82;
+
+  opacity: 1;
 }
 
 
-/* NAVIGATION */
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
 .client-nav {
   display: flex;
@@ -84,42 +95,44 @@
   text-align: left;
 
   border: none;
+
   background: transparent;
 
   padding: 13px 12px;
 
-  color: inherit;
+  color: #9a9b90;
 
   cursor: pointer;
 
   font: inherit;
-
   font-size: 13px;
 
   transition:
     background 0.25s ease,
-    opacity 0.25s ease,
+    color 0.25s ease,
     transform 0.25s ease;
 
-  opacity: 0.48;
+  opacity: 1;
 }
 
 .client-nav button:hover {
-  opacity: 1;
+  color: #f4efe5;
 
-  background: rgba(25, 24, 22, 0.055);
+  background: rgba(238, 233, 223, 0.06);
 
   transform: translateX(3px);
 }
 
 .client-nav button.active {
-  opacity: 1;
+  color: #ffffff;
 
-  background: rgba(25, 24, 22, 0.09);
+  background: #6f7159;
 }
 
 
-/* MESSAGE COUNT */
+/* =========================================================
+   MESSAGE COUNT
+========================================================= */
 
 .nav-count {
   font-size: 9px;
@@ -132,13 +145,17 @@
   display: grid;
   place-items: center;
 
-  border: 1px solid rgba(25, 24, 22, 0.2);
+  border: 1px solid rgba(238, 233, 223, 0.22);
+
+  color: #eee9df;
 
   font-weight: 500;
 }
 
 
-/* LOGOUT */
+/* =========================================================
+   LOGOUT
+========================================================= */
 
 .logout-button {
   margin-top: auto;
@@ -151,26 +168,30 @@
   justify-content: space-between;
   align-items: center;
 
-  border: 1px solid rgba(25, 24, 22, 0.2);
+  border: 1px solid rgba(238, 233, 223, 0.14);
 
   background: transparent;
 
-  color: inherit;
+  color: #929388;
 
   cursor: pointer;
 
   font: inherit;
-
   font-size: 12px;
 
-  transition: 0.25s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .logout-button:hover {
-  background: var(--ink, #191816);
-  color: var(--paper, #eee9df);
-}
+  background: rgba(238, 233, 223, 0.08);
 
+  color: #ffffff;
+
+  border-color: rgba(238, 233, 223, 0.28);
+}
 
 /* =========================================================
    MAIN CONTENT

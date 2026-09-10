@@ -3072,12 +3072,39 @@ ReactDOM
     CLIENT DASHBOARD
 ================================ */}
 
+{/* ================================
+    CLIENT DASHBOARD
+================================ */}
+
 <Route
   path="/client/dashboard"
   element={
     <ClientDashboard
       onLogout={() => {
-        window.location.href = "/login";
+
+        localStorage.removeItem(
+          "clientToken"
+        );
+
+        localStorage.removeItem(
+          "clientName"
+        );
+
+        localStorage.removeItem(
+          "clientEmail"
+        );
+
+        localStorage.removeItem(
+          "clientCompany"
+        );
+
+        localStorage.removeItem(
+          "clientRole"
+        );
+
+        window.location.href =
+          "/login";
+
       }}
     />
   }
