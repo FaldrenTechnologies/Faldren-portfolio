@@ -12,50 +12,100 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @Column(
-        name = "full_name",
-        nullable = false
+            name = "full_name",
+            nullable = false
     )
     private String fullName;
 
+
     @Column(
-        nullable = false,
-        unique = true
+            nullable = false,
+            unique = true
     )
     private String email;
 
+
     private String phone;
+
 
     @Column(name = "company_name")
     private String companyName;
 
+
     @Column(nullable = false)
     private String password;
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
+
+    // ==========================================
+    // ACCOUNT STATUS
+    // ==========================================
+
     @Column(
-        name = "created_at",
-        nullable = false
+            nullable = false,
+            columnDefinition = "boolean default true"
+    )
+    private boolean active = true;
+
+
+    // ==========================================
+    // FIRST LOGIN PASSWORD CHANGE
+    // ==========================================
+
+    @Column(
+            name = "must_change_password",
+            nullable = false,
+            columnDefinition = "boolean default false"
+    )
+    private boolean mustChangePassword = false;
+
+
+    @Column(
+            name = "created_at",
+            nullable = false
     )
     private LocalDateTime createdAt;
 
+
+
+    // ==========================================
+    // CONSTRUCTOR
+    // ==========================================
+
     public User() {
     }
+
+
+
+    // ==========================================
+    // PRE PERSIST
+    // ==========================================
 
     @PrePersist
     public void onCreate() {
 
         if (createdAt == null) {
-            createdAt = LocalDateTime.now();
+            createdAt =
+                    LocalDateTime.now();
         }
 
         if (role == null) {
-            role = Role.CLIENT;
+            role =
+                    Role.CLIENT;
         }
     }
+
+
+
+    // ==========================================
+    // GETTERS / SETTERS
+    // ==========================================
 
     public Long getId() {
         return id;
@@ -65,59 +115,111 @@ public class User {
         this.id = id;
     }
 
+
     public String getFullName() {
         return fullName;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFullName(
+            String fullName
+    ) {
+        this.fullName =
+                fullName;
     }
+
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmail(
+            String email
+    ) {
+        this.email =
+                email;
     }
+
 
     public String getPhone() {
         return phone;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhone(
+            String phone
+    ) {
+        this.phone =
+                phone;
     }
+
 
     public String getCompanyName() {
         return companyName;
     }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+    public void setCompanyName(
+            String companyName
+    ) {
+        this.companyName =
+                companyName;
     }
+
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(
+            String password
+    ) {
+        this.password =
+                password;
     }
+
 
     public Role getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setRole(
+            Role role
+    ) {
+        this.role =
+                role;
     }
+
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(
+            boolean active
+    ) {
+        this.active =
+                active;
+    }
+
+
+    public boolean isMustChangePassword() {
+        return mustChangePassword;
+    }
+
+    public void setMustChangePassword(
+            boolean mustChangePassword
+    ) {
+        this.mustChangePassword =
+                mustChangePassword;
+    }
+
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setCreatedAt(
+            LocalDateTime createdAt
+    ) {
+        this.createdAt =
+                createdAt;
     }
 }

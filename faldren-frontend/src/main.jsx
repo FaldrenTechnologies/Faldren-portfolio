@@ -37,6 +37,15 @@ import AdminClients from './admin/pages/AdminClients';
 import AdminProjects from './admin/pages/AdminProjects';
 import ProtectedAdminRoute from './admin/components/ProtectedAdminRoute';
 import ProtectedClientRoute from "./pages/client/ProtectedClientRoute";
+import AdminDevelopers from "./admin/pages/AdminDevelopers";
+import DeveloperLogin from "./developer/pages/DeveloperLogin";
+import DeveloperChangePassword from "./developer/pages/DeveloperChangePassword";
+import DeveloperTasks from "./developer/pages/DeveloperTasks";
+import AdminReviews from "./admin/pages/AdminReviews";
+
+import DeveloperDashboard from "./developer/pages/DeveloperDashboard";
+
+import ProtectedDeveloperRoute from "./developer/components/ProtectedDeveloperRoute";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -3073,6 +3082,13 @@ ReactDOM
     CLIENT DASHBOARD
 ================================ */}
 
+<Route
+  path="/developer/change-password"
+  element={
+    <DeveloperChangePassword />
+  }
+/>
+
 {/* ================================
     CLIENT DASHBOARD
 ================================ */}
@@ -3121,6 +3137,62 @@ ReactDOM
           }
         />
 
+        <Route
+  path="/developer/tasks"
+  element={
+    <ProtectedDeveloperRoute>
+      <DeveloperTasks />
+    </ProtectedDeveloperRoute>
+  }
+/>
+
+<Route
+  path="/admin/reviews"
+  element={
+    <ProtectedAdminRoute>
+      <AdminReviews />
+    </ProtectedAdminRoute>
+  }
+/>
+
+{/* ================================
+    DEVELOPER LOGIN
+================================ */}
+
+<Route
+  path="/developer/login"
+  element={
+    <DeveloperLogin />
+  }
+/>
+
+
+{/* ================================
+    DEVELOPER CHANGE PASSWORD
+================================ */}
+
+<Route
+  path="/developer/change-password"
+  element={
+    <ProtectedDeveloperRoute>
+      <DeveloperChangePassword />
+    </ProtectedDeveloperRoute>
+  }
+/>
+
+
+{/* ================================
+    DEVELOPER DASHBOARD
+================================ */}
+
+<Route
+  path="/developer/dashboard"
+  element={
+    <ProtectedDeveloperRoute>
+      <DeveloperDashboard />
+    </ProtectedDeveloperRoute>
+  }
+/>
 
         {/* ================================
             ADMIN CLIENTS
@@ -3134,6 +3206,14 @@ ReactDOM
             </ProtectedAdminRoute>
           }
         />
+        <Route
+  path="/admin/developers"
+  element={
+    <ProtectedAdminRoute>
+      <AdminDevelopers />
+    </ProtectedAdminRoute>
+  }
+/>
 
         <Route
   path="/admin/projects"
@@ -3142,6 +3222,11 @@ ReactDOM
       <AdminProjects />
     </ProtectedAdminRoute>
   }
+/>
+
+<Route
+  path="/developer/login"
+  element={<DeveloperLogin />}
 />
 
 <Route

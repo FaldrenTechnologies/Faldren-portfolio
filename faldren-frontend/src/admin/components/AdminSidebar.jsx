@@ -3,9 +3,11 @@ import React from "react";
 import {
   LayoutDashboard,
   Users,
+  UserCog,
   FolderKanban,
   Inbox,
   Settings,
+  GitPullRequest,
   LogOut
 } from "lucide-react";
 
@@ -23,7 +25,14 @@ function AdminSidebar() {
 
 
   const isActive = (path) => {
-    return location.pathname === path;
+
+    return (
+      location.pathname === path ||
+      location.pathname.startsWith(
+        `${path}/`
+      )
+    );
+
   };
 
 
@@ -82,6 +91,8 @@ function AdminSidebar() {
       <nav className="admin-sidebar-nav">
 
 
+        {/* OVERVIEW */}
+
         <button
           type="button"
           className={
@@ -111,6 +122,8 @@ function AdminSidebar() {
         </button>
 
 
+
+        {/* CLIENTS */}
 
         <button
           type="button"
@@ -142,6 +155,40 @@ function AdminSidebar() {
 
 
 
+        {/* DEVELOPERS */}
+
+        <button
+          type="button"
+          className={
+            `admin-nav-item ${
+              isActive(
+                "/admin/developers"
+              )
+                ? "active"
+                : ""
+            }`
+          }
+          onClick={() =>
+            navigate(
+              "/admin/developers"
+            )
+          }
+        >
+
+          <UserCog
+            size={18}
+          />
+
+          <span>
+            Developers
+          </span>
+
+        </button>
+
+
+
+        {/* PROJECTS */}
+
         <button
           type="button"
           className={
@@ -171,6 +218,40 @@ function AdminSidebar() {
         </button>
 
 
+
+        {/* REVIEWS */}
+
+        <button
+          type="button"
+          className={
+            `admin-nav-item ${
+              isActive(
+                "/admin/reviews"
+              )
+                ? "active"
+                : ""
+            }`
+          }
+          onClick={() =>
+            navigate(
+              "/admin/reviews"
+            )
+          }
+        >
+
+          <GitPullRequest
+            size={18}
+          />
+
+          <span>
+            Reviews
+          </span>
+
+        </button>
+
+
+
+        {/* REQUESTS */}
 
         <button
           type="button"

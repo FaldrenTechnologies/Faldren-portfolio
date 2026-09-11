@@ -22,41 +22,50 @@ function Login() {
   const [success, setSuccess] =
     useState(false);
 
+  const clearAdminSession = () => {
+
+  localStorage.removeItem("adminToken");
+  localStorage.removeItem("adminRole");
+  localStorage.removeItem("adminName");
+  localStorage.removeItem("adminEmail");
+  localStorage.removeItem("adminLoggedIn");
+
+};
+
 
   // ==========================================
   // ALREADY LOGGED IN
   // ==========================================
+useEffect(() => {
 
-  useEffect(() => {
+  const token =
+    localStorage.getItem(
+      "clientToken"
+    );
 
-    const token =
-      localStorage.getItem(
-        "clientToken"
-      );
-
-    const role =
-      localStorage.getItem(
-        "clientRole"
-      );
-
-
-    if (
-      token &&
-      role === "CLIENT"
-    ) {
-
-      navigate(
-        "/client/dashboard",
-        {
-          replace: true
-        }
-      );
-
-    }
-
-  }, [navigate]);
+  const role =
+    localStorage.getItem(
+      "clientRole"
+    );
 
 
+  if (
+    token &&
+    role === "CLIENT"
+  ) {
+
+    clearAdminSession();
+
+    navigate(
+      "/client/dashboard",
+      {
+        replace: true
+      }
+    );
+
+  }
+
+}, [navigate]);
 
   // ==========================================
   // LOGIN
@@ -118,6 +127,12 @@ function Login() {
 
         return;
       }
+
+      // ======================================
+// REMOVE OLD ADMIN SESSION
+// ======================================
+
+clearAdminSession();
 
 
       // ======================================

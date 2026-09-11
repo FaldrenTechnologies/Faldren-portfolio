@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   ArrowRight,
   Eye,
@@ -11,12 +12,30 @@ import {
 import "../admin.css";
 
 
+// ==========================================
+// CLEAR CLIENT SESSION
+// ==========================================
+
+const clearClientSession = () => {
+
+  localStorage.removeItem("clientToken");
+  localStorage.removeItem("clientRole");
+  localStorage.removeItem("clientName");
+  localStorage.removeItem("clientEmail");
+  localStorage.removeItem("clientCompany");
+
+};
+
+
 function AdminLogin() {
 
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
 
   const [showPassword, setShowPassword] =
     useState(false);
@@ -35,16 +54,25 @@ function AdminLogin() {
   useEffect(() => {
 
     const token =
-      localStorage.getItem("adminToken");
+      localStorage.getItem(
+        "adminToken"
+      );
 
     const role =
-      localStorage.getItem("adminRole");
+      localStorage.getItem(
+        "adminRole"
+      );
 
 
     if (
       token &&
       role === "ADMIN"
     ) {
+
+      // Only one portal session
+      // can exist at a time.
+      clearClientSession();
+
 
       navigate(
         "/admin/dashboard",
@@ -111,10 +139,12 @@ function AdminLogin() {
             },
 
             body: JSON.stringify({
+
               email:
                 email.trim(),
 
               password
+
             })
           }
         );
@@ -135,30 +165,37 @@ function AdminLogin() {
           "Invalid email or password."
         );
 
-        setLoading(false);
-
         return;
+
       }
 
 
       // ======================================
-      // EXTRA ADMIN ROLE CHECK
+      // ADMIN ROLE CHECK
       // ======================================
 
-      if (data.role !== "ADMIN") {
+      if (
+        data.role !== "ADMIN"
+      ) {
 
         setError(
           "Admin access denied."
         );
 
-        setLoading(false);
-
         return;
+
       }
 
 
       // ======================================
-      // SAVE LOGIN DATA
+      // REMOVE OLD CLIENT SESSION
+      // ======================================
+
+      clearClientSession();
+
+
+      // ======================================
+      // SAVE ADMIN LOGIN
       // ======================================
 
       localStorage.setItem(
@@ -182,7 +219,8 @@ function AdminLogin() {
       );
 
 
-      // Remove old temporary login value
+      // Remove old temporary value
+
       localStorage.removeItem(
         "adminLoggedIn"
       );

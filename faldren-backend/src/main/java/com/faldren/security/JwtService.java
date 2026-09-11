@@ -17,6 +17,9 @@ import java.util.Date;
 @Service
 public class JwtService {
 
+    private static final String ISSUER =
+            "FALDREN";
+
     @Value("${app.jwt.secret}")
     private String jwtSecret;
 
@@ -24,18 +27,33 @@ public class JwtService {
     private long jwtExpiration;
 
 
+    // ==========================================
+    // SIGNING KEY
+    // ==========================================
+
     private SecretKey getSigningKey() {
 
         byte[] keyBytes =
-                Decoders.BASE64.decode(jwtSecret);
+                Decoders.BASE64.decode(
+                        jwtSecret
+                );
 
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(
+                keyBytes
+        );
     }
 
 
-    public String generateToken(User user) {
+    // ==========================================
+    // GENERATE TOKEN
+    // ==========================================
 
-        Date now = new Date();
+    public String generateToken(
+            User user
+    ) {
+
+        Date now =
+                new Date();
 
         Date expiry =
                 new Date(
@@ -43,40 +61,79 @@ public class JwtService {
                         + jwtExpiration
                 );
 
+
         return Jwts
                 .builder()
-                .subject(user.getEmail())
+
+                .issuer(
+                        ISSUER
+                )
+
+                .subject(
+                        user.getEmail()
+                )
+
                 .claim(
                         "role",
-                        user.getRole().name()
+                        user.getRole()
+                                .name()
                 )
+
                 .claim(
                         "name",
                         user.getFullName()
                 )
-                .issuedAt(now)
-                .expiration(expiry)
-                .signWith(getSigningKey())
+
+                .issuedAt(
+                        now
+                )
+
+                .expiration(
+                        expiry
+                )
+
+                .signWith(
+                        getSigningKey()
+                )
+
                 .compact();
     }
 
 
-    public String extractEmail(String token) {
+    // ==========================================
+    // EXTRACT EMAIL
+    // ==========================================
 
-        return extractClaims(token)
-                .getSubject();
+    public String extractEmail(
+            String token
+    ) {
+
+        return extractClaims(
+                token
+        ).getSubject();
     }
 
 
-    public String extractRole(String token) {
+    // ==========================================
+    // EXTRACT ROLE
+    // ==========================================
 
-        return extractClaims(token)
-                .get(
-                        "role",
-                        String.class
-                );
+    public String extractRole(
+            String token
+    ) {
+
+        return extractClaims(
+                token
+        ).get(
+                "role",
+                String.class
+        );
     }
 
+
+    // ==========================================
+    // VALIDATE TOKEN
+    // ==========================================
 
     public boolean isTokenValid(
             String token
@@ -85,11 +142,56 @@ public class JwtService {
         try {
 
             Claims claims =
-                    extractClaims(token);
+                    extractClaims(
+                            token
+                    );
 
-            return claims
-                    .getExpiration()
-                    .after(new Date());
+
+            String subject =
+                    claims.getSubject();
+
+            Date issuedAt =
+                    claims.getIssuedAt();
+
+            Date expiration =
+                    claims.getExpiration();
+
+            Date now =
+                    new Date();
+
+
+            if (
+                    subject == null
+                    ||
+                    subject.isBlank()
+            ) {
+
+                return false;
+            }
+
+
+            if (
+                    issuedAt == null
+                    ||
+                    issuedAt.after(now)
+            ) {
+
+                return false;
+            }
+
+
+            if (
+                    expiration == null
+                    ||
+                    !expiration.after(now)
+            ) {
+
+                return false;
+            }
+
+
+            return true;
+
 
         } catch (Exception exception) {
 
@@ -98,17 +200,31 @@ public class JwtService {
     }
 
 
+    // ==========================================
+    // PARSE + VERIFY JWT
+    // ==========================================
+
     private Claims extractClaims(
             String token
     ) {
 
         return Jwts
                 .parser()
+
                 .verifyWith(
                         getSigningKey()
                 )
+
+                .requireIssuer(
+                        ISSUER
+                )
+
                 .build()
-                .parseSignedClaims(token)
+
+                .parseSignedClaims(
+                        token
+                )
+
                 .getPayload();
     }
 }

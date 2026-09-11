@@ -8,10 +8,15 @@ import {
   Search,
   Plus,
   CalendarDays,
-  MoreHorizontal
+  MoreHorizontal,
+  X,
+  GitBranch,
+  UserRound,
+  FolderKanban
 } from "lucide-react";
 
 import AdminSidebar from "../components/AdminSidebar";
+
 import "../admin.css";
 
 
@@ -19,7 +24,24 @@ const API_BASE =
   "http://localhost:8080";
 
 
+const EMPTY_MODULE_FORM = {
+  moduleName: "",
+  developerId: "",
+  description: "",
+  acceptanceCriteria: "",
+  repoUrl: "",
+  baseBranch: "develop",
+  branchName: "",
+  priority: "MEDIUM",
+  deadline: ""
+};
+
+
 function AdminProjects() {
+
+  // ==========================================
+  // PROJECT STATES
+  // ==========================================
 
   const [projects, setProjects] =
     useState([]);
@@ -37,10 +59,109 @@ function AdminProjects() {
     useState("");
 
 
+  // ==========================================
+  // MODULE STATES
+  // ==========================================
+
+  const [
+    selectedProject,
+    setSelectedProject
+  ] = useState(null);
+
+  const [
+    developers,
+    setDevelopers
+  ] = useState([]);
+
+  const [
+    modules,
+    setModules
+  ] = useState([]);
+
+  const [
+    modulesLoading,
+    setModulesLoading
+  ] = useState(false);
+
+  const [
+    moduleSaving,
+    setModuleSaving
+  ] = useState(false);
+
+  const [
+    moduleError,
+    setModuleError
+  ] = useState("");
+
+  const [
+    moduleSuccess,
+    setModuleSuccess
+  ] = useState("");
+
+  const [
+    showModuleForm,
+    setShowModuleForm
+  ] = useState(false);
+
+  const [
+    branchManuallyEdited,
+    setBranchManuallyEdited
+  ] = useState(false);
+
+  const [
+    moduleForm,
+    setModuleForm
+  ] = useState(
+    EMPTY_MODULE_FORM
+  );
+
+
   const adminName =
     localStorage.getItem(
       "adminName"
     ) || "Administrator";
+
+
+  // ==========================================
+  // ADMIN TOKEN
+  // ==========================================
+
+  const getAdminToken = () =>
+    localStorage.getItem(
+      "adminToken"
+    );
+
+
+  // ==========================================
+  // ADMIN LOGOUT ON INVALID SESSION
+  // ==========================================
+
+  const clearAdminSession = () => {
+
+    localStorage.removeItem(
+      "adminToken"
+    );
+
+    localStorage.removeItem(
+      "adminName"
+    );
+
+    localStorage.removeItem(
+      "adminEmail"
+    );
+
+    localStorage.removeItem(
+      "adminRole"
+    );
+
+    localStorage.removeItem(
+      "adminLoggedIn"
+    );
+
+
+    window.location.href =
+      "/admin/login";
+  };
 
 
   // ==========================================
@@ -51,15 +172,12 @@ function AdminProjects() {
     async () => {
 
       const token =
-        localStorage.getItem(
-          "adminToken"
-        );
+        getAdminToken();
 
 
       if (!token) {
 
-        window.location.href =
-          "/admin/login";
+        clearAdminSession();
 
         return;
       }
@@ -85,31 +203,12 @@ function AdminProjects() {
           );
 
 
-        // Admin session expired / invalid
-
         if (
           response.status === 401 ||
           response.status === 403
         ) {
 
-          localStorage.removeItem(
-            "adminToken"
-          );
-
-          localStorage.removeItem(
-            "adminName"
-          );
-
-          localStorage.removeItem(
-            "adminEmail"
-          );
-
-          localStorage.removeItem(
-            "adminRole"
-          );
-
-          window.location.href =
-            "/admin/login";
+          clearAdminSession();
 
           return;
         }
@@ -159,11 +258,580 @@ function AdminProjects() {
     };
 
 
+  // ==========================================
+  // LOAD DEVELOPERS
+  // ==========================================
+
+  const loadDevelopers =
+    async () => {
+
+      const token =
+        getAdminToken();
+
+
+      if (!token) {
+        return;
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            `${API_BASE}/api/admin/developers`,
+            {
+              method: "GET",
+
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+
+          clearAdminSession();
+
+          return;
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            data.message ||
+            "Unable to load developers."
+          );
+        }
+
+
+        setDevelopers(
+          Array.isArray(data)
+            ? data.filter(
+                developer =>
+                  developer.active
+              )
+            : []
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Developer loading error:",
+          error
+        );
+
+      }
+
+    };
+
+
+  // ==========================================
+  // INITIAL LOAD
+  // ==========================================
+
   useEffect(() => {
 
     loadProjects();
 
+    loadDevelopers();
+
   }, []);
+
+
+  // ==========================================
+  // LOAD MODULES FOR PROJECT
+  // ==========================================
+
+  const loadProjectModules =
+    async (projectId) => {
+
+      const token =
+        getAdminToken();
+
+
+      if (!token) {
+
+        clearAdminSession();
+
+        return;
+      }
+
+
+      try {
+
+        setModulesLoading(true);
+        setModuleError("");
+
+
+        const response =
+          await fetch(
+            `${API_BASE}/api/admin/modules/project/${projectId}`,
+            {
+              method: "GET",
+
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+
+          clearAdminSession();
+
+          return;
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          setModuleError(
+            data.message ||
+            "Unable to load modules."
+          );
+
+          return;
+        }
+
+
+        setModules(
+          Array.isArray(data)
+            ? data
+            : []
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Module loading error:",
+          error
+        );
+
+
+        setModuleError(
+          "Unable to connect to the backend."
+        );
+
+
+      } finally {
+
+        setModulesLoading(false);
+
+      }
+
+    };
+
+
+  // ==========================================
+  // OPEN MODULE WORKSPACE
+  // ==========================================
+
+  const openModuleWorkspace =
+    (project) => {
+
+      setSelectedProject(
+        project
+      );
+
+      setModules([]);
+
+      setModuleError("");
+
+      setModuleSuccess("");
+
+      setShowModuleForm(false);
+
+      setModuleForm(
+        EMPTY_MODULE_FORM
+      );
+
+      setBranchManuallyEdited(
+        false
+      );
+
+
+      loadProjectModules(
+        project.id
+      );
+
+    };
+
+
+  // ==========================================
+  // CLOSE MODULE WORKSPACE
+  // ==========================================
+
+  const closeModuleWorkspace =
+    () => {
+
+      setSelectedProject(null);
+
+      setModules([]);
+
+      setModuleError("");
+
+      setModuleSuccess("");
+
+      setShowModuleForm(false);
+
+      setModuleForm(
+        EMPTY_MODULE_FORM
+      );
+
+      setBranchManuallyEdited(
+        false
+      );
+
+    };
+
+
+  // ==========================================
+  // BRANCH SLUG
+  // ==========================================
+
+  const createBranchName =
+    (
+      projectId,
+      moduleName
+    ) => {
+
+      const slug =
+        moduleName
+          .trim()
+          .toLowerCase()
+          .replace(
+            /[^a-z0-9]+/g,
+            "-"
+          )
+          .replace(
+            /^-+|-+$/g,
+            ""
+          );
+
+
+      if (!slug) {
+        return "";
+      }
+
+
+      return `feature/P${projectId}-${slug}`;
+    };
+
+
+  // ==========================================
+  // MODULE FORM CHANGE
+  // ==========================================
+
+  const handleModuleChange =
+    (event) => {
+
+      const {
+        name,
+        value
+      } = event.target;
+
+
+      if (
+        name === "branchName"
+      ) {
+
+        setBranchManuallyEdited(
+          true
+        );
+
+
+        setModuleForm(
+          current => ({
+            ...current,
+            branchName: value
+          })
+        );
+
+        return;
+      }
+
+
+      setModuleForm(
+        current => {
+
+          const updated = {
+            ...current,
+            [name]: value
+          };
+
+
+          if (
+            name === "moduleName" &&
+            selectedProject &&
+            !branchManuallyEdited
+          ) {
+
+            updated.branchName =
+              createBranchName(
+                selectedProject.id,
+                value
+              );
+
+          }
+
+
+          return updated;
+
+        }
+      );
+
+    };
+
+
+  // ==========================================
+  // RESET MODULE FORM
+  // ==========================================
+
+  const resetModuleForm =
+    () => {
+
+      setModuleForm(
+        EMPTY_MODULE_FORM
+      );
+
+      setBranchManuallyEdited(
+        false
+      );
+
+      setModuleError("");
+
+      setModuleSuccess("");
+
+    };
+
+
+  // ==========================================
+  // CREATE MODULE
+  // ==========================================
+
+  const handleCreateModule =
+    async (event) => {
+
+      event.preventDefault();
+
+
+      if (!selectedProject) {
+        return;
+      }
+
+
+      const token =
+        getAdminToken();
+
+
+      if (!token) {
+
+        clearAdminSession();
+
+        return;
+      }
+
+
+      if (
+        !moduleForm.moduleName.trim()
+      ) {
+
+        setModuleError(
+          "Module name is required."
+        );
+
+        return;
+      }
+
+
+      if (
+        !moduleForm.developerId
+      ) {
+
+        setModuleError(
+          "Select a developer."
+        );
+
+        return;
+      }
+
+
+      if (
+        !moduleForm.branchName.trim()
+      ) {
+
+        setModuleError(
+          "Git branch name is required."
+        );
+
+        return;
+      }
+
+
+      try {
+
+        setModuleSaving(true);
+
+        setModuleError("");
+
+        setModuleSuccess("");
+
+
+        const response =
+          await fetch(
+            `${API_BASE}/api/admin/modules`,
+            {
+              method: "POST",
+
+              headers: {
+
+                "Content-Type":
+                  "application/json",
+
+                Authorization:
+                  `Bearer ${token}`
+
+              },
+
+              body: JSON.stringify({
+
+                projectId:
+                  selectedProject.id,
+
+                developerId:
+                  Number(
+                    moduleForm.developerId
+                  ),
+
+                moduleName:
+                  moduleForm
+                    .moduleName
+                    .trim(),
+
+                description:
+                  moduleForm
+                    .description
+                    .trim(),
+
+                acceptanceCriteria:
+                  moduleForm
+                    .acceptanceCriteria
+                    .trim(),
+
+                repoUrl:
+                  moduleForm
+                    .repoUrl
+                    .trim(),
+
+                baseBranch:
+                  moduleForm
+                    .baseBranch
+                    .trim(),
+
+                branchName:
+                  moduleForm
+                    .branchName
+                    .trim(),
+
+                priority:
+                  moduleForm.priority,
+
+                deadline:
+                  moduleForm.deadline ||
+                  null
+
+              })
+            }
+          );
+
+
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+
+          clearAdminSession();
+
+          return;
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          setModuleError(
+            data.message ||
+            "Unable to create module."
+          );
+
+          return;
+        }
+
+
+        setModules(
+          current => [
+            data,
+            ...current
+          ]
+        );
+
+
+        resetModuleForm();
+
+        setShowModuleForm(
+          false
+        );
+
+
+        setModuleSuccess(
+          "Module created and assigned successfully."
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Module creation error:",
+          error
+        );
+
+
+        setModuleError(
+          "Unable to connect to the backend."
+        );
+
+
+      } finally {
+
+        setModuleSaving(false);
+
+      }
+
+    };
 
 
   // ==========================================
@@ -180,7 +848,7 @@ function AdminProjects() {
 
 
       return projects.filter(
-        (project) => {
+        project => {
 
           const title =
             project.title || "";
@@ -202,26 +870,35 @@ function AdminProjects() {
 
             title
               .toLowerCase()
-              .includes(searchValue) ||
+              .includes(
+                searchValue
+              ) ||
 
             clientName
               .toLowerCase()
-              .includes(searchValue) ||
+              .includes(
+                searchValue
+              ) ||
 
             companyName
               .toLowerCase()
-              .includes(searchValue) ||
+              .includes(
+                searchValue
+              ) ||
 
             category
               .toLowerCase()
-              .includes(searchValue);
+              .includes(
+                searchValue
+              );
 
 
           const matchesStatus =
 
             statusFilter === "ALL" ||
 
-            status === statusFilter;
+            status ===
+              statusFilter;
 
 
           return (
@@ -244,7 +921,7 @@ function AdminProjects() {
   // ==========================================
 
   const formatStatus =
-    (status) => {
+    status => {
 
       if (!status) {
         return "—";
@@ -264,7 +941,7 @@ function AdminProjects() {
   // ==========================================
 
   const formatDate =
-    (date) => {
+    date => {
 
       if (!date) {
         return "—";
@@ -282,32 +959,37 @@ function AdminProjects() {
           parsed.getTime()
         )
       ) {
+
         return date;
+
       }
 
 
-      return parsed.toLocaleDateString(
-        "en-IN",
-        {
-          day: "2-digit",
-          month: "short",
-          year: "numeric"
-        }
-      );
+      return parsed
+        .toLocaleDateString(
+          "en-IN",
+          {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          }
+        );
 
     };
 
 
   // ==========================================
-  // CLIENT DISPLAY NAME
+  // CLIENT DISPLAY
   // ==========================================
 
   const getClientDisplay =
-    (project) => {
+    project => {
 
       if (
         project.clientCompany &&
-        project.clientCompany.trim()
+        project
+          .clientCompany
+          .trim()
       ) {
 
         return project.clientCompany;
@@ -337,7 +1019,9 @@ function AdminProjects() {
       <main className="admin-main">
 
 
-        {/* ================= TOP BAR ================= */}
+        {/* ======================================
+            TOP BAR
+        ====================================== */}
 
         <header className="admin-topbar">
 
@@ -382,8 +1066,9 @@ function AdminProjects() {
         </header>
 
 
-
-        {/* ================= INTRO ================= */}
+        {/* ======================================
+            INTRO
+        ====================================== */}
 
         <section className="admin-projects-intro">
 
@@ -436,11 +1121,11 @@ function AdminProjects() {
         </section>
 
 
-
-        {/* ================= SEARCH + FILTER ================= */}
+        {/* ======================================
+            SEARCH + FILTER
+        ====================================== */}
 
         <section className="admin-project-actions">
-
 
           <div className="admin-project-search">
 
@@ -454,7 +1139,7 @@ function AdminProjects() {
               placeholder="Search projects..."
               value={search}
               onChange={
-                (event) =>
+                event =>
                   setSearch(
                     event.target.value
                   )
@@ -464,15 +1149,13 @@ function AdminProjects() {
           </div>
 
 
-
           <div className="admin-project-action-right">
-
 
             <select
               className="admin-project-filter"
               value={statusFilter}
               onChange={
-                (event) =>
+                event =>
                   setStatusFilter(
                     event.target.value
                   )
@@ -510,16 +1193,10 @@ function AdminProjects() {
             </select>
 
 
-
-            {/* 
-              Manual project creation
-              backend flow later.
-            */}
-
             <button
               className="admin-create-project-btn"
               type="button"
-              title="Manual project creation will be added next"
+              title="Manual project creation will be added later"
             >
 
               <Plus
@@ -536,33 +1213,24 @@ function AdminProjects() {
         </section>
 
 
-
-        {/* ================= ERROR ================= */}
+        {/* ======================================
+            PROJECT ERROR
+        ====================================== */}
 
         {error && (
 
-          <div
-            style={{
-              marginBottom: "20px",
-              padding: "14px 16px",
-              border:
-                "1px solid rgba(130, 74, 60, 0.25)",
-              color: "#7c463b"
-            }}
-          >
-
+          <div className="admin-project-api-error">
             {error}
-
           </div>
 
         )}
 
 
-
-        {/* ================= PROJECT TABLE ================= */}
+        {/* ======================================
+            PROJECT TABLE
+        ====================================== */}
 
         <section className="admin-project-table">
-
 
           <div className="admin-project-table-head">
 
@@ -597,11 +1265,8 @@ function AdminProjects() {
           </div>
 
 
-
           <div className="admin-project-list">
 
-
-            {/* LOADING */}
 
             {loading ? (
 
@@ -622,14 +1287,10 @@ function AdminProjects() {
 
               </div>
 
-            ) : filteredProjects.length >
-              0 ? (
-
-
-              /* ================= REAL PROJECTS ================= */
+            ) : filteredProjects.length > 0 ? (
 
               filteredProjects.map(
-                (project) => (
+                project => (
 
                   <article
                     className="admin-project-row"
@@ -655,7 +1316,6 @@ function AdminProjects() {
                       </span>
 
                     </div>
-
 
 
                     {/* CLIENT */}
@@ -695,7 +1355,6 @@ function AdminProjects() {
                     </div>
 
 
-
                     {/* STATUS */}
 
                     <div>
@@ -720,7 +1379,6 @@ function AdminProjects() {
                       </span>
 
                     </div>
-
 
 
                     {/* PROGRESS */}
@@ -766,7 +1424,6 @@ function AdminProjects() {
                     </div>
 
 
-
                     {/* DUE DATE */}
 
                     <div className="admin-project-date">
@@ -785,7 +1442,6 @@ function AdminProjects() {
                       </span>
 
                     </div>
-
 
 
                     {/* PRIORITY */}
@@ -813,15 +1469,19 @@ function AdminProjects() {
                     </div>
 
 
-
                     {/* ACTION */}
 
                     <div className="admin-project-menu">
 
                       <button
                         type="button"
-                        aria-label="Project actions"
-                        title="Project editing will be added next"
+                        aria-label="Manage project modules"
+                        title="Manage modules"
+                        onClick={() =>
+                          openModuleWorkspace(
+                            project
+                          )
+                        }
                       >
 
                         <MoreHorizontal
@@ -839,8 +1499,6 @@ function AdminProjects() {
               )
 
             ) : (
-
-              /* ================= EMPTY ================= */
 
               <div className="admin-project-empty">
 
@@ -871,6 +1529,719 @@ function AdminProjects() {
         </section>
 
       </main>
+
+
+      {/* ========================================
+          MODULE WORKSPACE DRAWER
+      ======================================== */}
+
+      {selectedProject && (
+
+        <div
+          className="admin-module-backdrop"
+          onClick={
+            closeModuleWorkspace
+          }
+        >
+
+          <aside
+            className="admin-module-drawer"
+            onClick={
+              event =>
+                event.stopPropagation()
+            }
+          >
+
+
+            {/* HEADER */}
+
+            <div className="admin-module-drawer-head">
+
+              <div>
+
+                <span>
+                  PROJECT /
+                  {" "}
+                  {String(
+                    selectedProject.id
+                  ).padStart(
+                    3,
+                    "0"
+                  )}
+                </span>
+
+                <h2>
+                  Manage modules
+                </h2>
+
+                <p>
+                  {selectedProject.title}
+                </p>
+
+              </div>
+
+
+              <button
+                type="button"
+                onClick={
+                  closeModuleWorkspace
+                }
+                aria-label="Close module workspace"
+              >
+
+                <X
+                  size={20}
+                />
+
+              </button>
+
+            </div>
+
+
+            {/* MODULE SUMMARY */}
+
+            <div className="admin-module-summary">
+
+              <div>
+
+                <span>
+                  MODULES
+                </span>
+
+                <strong>
+                  {String(
+                    modules.length
+                  ).padStart(
+                    2,
+                    "0"
+                  )}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  PROJECT
+                </span>
+
+                <strong>
+                  {selectedProject.title}
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            {/* MESSAGES */}
+
+            {moduleError && (
+
+              <div className="admin-module-error">
+                {moduleError}
+              </div>
+
+            )}
+
+
+            {moduleSuccess && (
+
+              <div className="admin-module-success">
+                {moduleSuccess}
+              </div>
+
+            )}
+
+
+            {/* ADD MODULE BUTTON */}
+
+            {!showModuleForm && (
+
+              <button
+                type="button"
+                className="admin-module-add-btn"
+                onClick={() => {
+
+                  resetModuleForm();
+
+                  setShowModuleForm(
+                    true
+                  );
+
+                }}
+              >
+
+                <Plus
+                  size={17}
+                />
+
+                Add module
+
+              </button>
+
+            )}
+
+
+            {/* ==================================
+                CREATE MODULE FORM
+            ================================== */}
+
+            {showModuleForm && (
+
+              <form
+                className="admin-module-form"
+                onSubmit={
+                  handleCreateModule
+                }
+              >
+
+                <div className="admin-module-form-head">
+
+                  <div>
+
+                    <span>
+                      NEW MODULE
+                    </span>
+
+                    <h3>
+                      Assign work
+                    </h3>
+
+                  </div>
+
+
+                  <button
+                    type="button"
+                    onClick={() => {
+
+                      resetModuleForm();
+
+                      setShowModuleForm(
+                        false
+                      );
+
+                    }}
+                  >
+
+                    <X
+                      size={18}
+                    />
+
+                  </button>
+
+                </div>
+
+
+                {/* MODULE NAME */}
+
+                <div className="admin-module-field">
+
+                  <label>
+                    Module name *
+                  </label>
+
+                  <input
+                    type="text"
+                    name="moduleName"
+                    placeholder="Authentication"
+                    value={
+                      moduleForm.moduleName
+                    }
+                    onChange={
+                      handleModuleChange
+                    }
+                    required
+                  />
+
+                </div>
+
+
+                {/* DEVELOPER */}
+
+                <div className="admin-module-field">
+
+                  <label>
+                    Assigned developer *
+                  </label>
+
+                  <select
+                    name="developerId"
+                    value={
+                      moduleForm.developerId
+                    }
+                    onChange={
+                      handleModuleChange
+                    }
+                    required
+                  >
+
+                    <option value="">
+                      Select developer
+                    </option>
+
+                    {developers.map(
+                      developer => (
+
+                        <option
+                          key={developer.id}
+                          value={developer.id}
+                        >
+
+                          {developer.fullName}
+                          {" — "}
+                          {developer.email}
+
+                        </option>
+
+                      )
+                    )}
+
+                  </select>
+
+                </div>
+
+
+                {/* DESCRIPTION */}
+
+                <div className="admin-module-field">
+
+                  <label>
+                    Description
+                  </label>
+
+                  <textarea
+                    name="description"
+                    placeholder="Describe the work expected in this module..."
+                    value={
+                      moduleForm.description
+                    }
+                    onChange={
+                      handleModuleChange
+                    }
+                    rows={3}
+                  />
+
+                </div>
+
+
+                {/* ACCEPTANCE CRITERIA */}
+
+                <div className="admin-module-field">
+
+                  <label>
+                    Acceptance criteria
+                  </label>
+
+                  <textarea
+                    name="acceptanceCriteria"
+                    placeholder="What must be completed before this module can be approved?"
+                    value={
+                      moduleForm
+                        .acceptanceCriteria
+                    }
+                    onChange={
+                      handleModuleChange
+                    }
+                    rows={3}
+                  />
+
+                </div>
+
+
+                {/* REPO */}
+
+                <div className="admin-module-field">
+
+                  <label>
+                    Repository URL
+                  </label>
+
+                  <input
+                    type="url"
+                    name="repoUrl"
+                    placeholder="https://github.com/..."
+                    value={
+                      moduleForm.repoUrl
+                    }
+                    onChange={
+                      handleModuleChange
+                    }
+                  />
+
+                </div>
+
+
+                {/* BRANCH ROW */}
+
+                <div className="admin-module-form-row">
+
+                  <div className="admin-module-field">
+
+                    <label>
+                      Base branch
+                    </label>
+
+                    <input
+                      type="text"
+                      name="baseBranch"
+                      placeholder="develop"
+                      value={
+                        moduleForm.baseBranch
+                      }
+                      onChange={
+                        handleModuleChange
+                      }
+                    />
+
+                  </div>
+
+
+                  <div className="admin-module-field">
+
+                    <label>
+                      Feature branch *
+                    </label>
+
+                    <input
+                      type="text"
+                      name="branchName"
+                      placeholder="feature/P1-auth"
+                      value={
+                        moduleForm.branchName
+                      }
+                      onChange={
+                        handleModuleChange
+                      }
+                      required
+                    />
+
+                  </div>
+
+                </div>
+
+
+                {/* PRIORITY / DEADLINE */}
+
+                <div className="admin-module-form-row">
+
+                  <div className="admin-module-field">
+
+                    <label>
+                      Priority
+                    </label>
+
+                    <select
+                      name="priority"
+                      value={
+                        moduleForm.priority
+                      }
+                      onChange={
+                        handleModuleChange
+                      }
+                    >
+
+                      <option value="LOW">
+                        Low
+                      </option>
+
+                      <option value="MEDIUM">
+                        Medium
+                      </option>
+
+                      <option value="HIGH">
+                        High
+                      </option>
+
+                    </select>
+
+                  </div>
+
+
+                  <div className="admin-module-field">
+
+                    <label>
+                      Deadline
+                    </label>
+
+                    <input
+                      type="date"
+                      name="deadline"
+                      value={
+                        moduleForm.deadline
+                      }
+                      onChange={
+                        handleModuleChange
+                      }
+                    />
+
+                  </div>
+
+                </div>
+
+
+                {/* ACTIONS */}
+
+                <div className="admin-module-form-actions">
+
+                  <button
+                    type="button"
+                    className="admin-module-cancel"
+                    disabled={
+                      moduleSaving
+                    }
+                    onClick={() => {
+
+                      resetModuleForm();
+
+                      setShowModuleForm(
+                        false
+                      );
+
+                    }}
+                  >
+
+                    Cancel
+
+                  </button>
+
+
+                  <button
+                    type="submit"
+                    className="admin-module-save"
+                    disabled={
+                      moduleSaving
+                    }
+                  >
+
+                    {moduleSaving
+                      ? "Creating..."
+                      : "Create module"}
+
+                  </button>
+
+                </div>
+
+              </form>
+
+            )}
+
+
+            {/* ==================================
+                MODULE LIST
+            ================================== */}
+
+            <div className="admin-module-list">
+
+              <div className="admin-module-list-title">
+
+                <span>
+                  ASSIGNED MODULES
+                </span>
+
+              </div>
+
+
+              {modulesLoading ? (
+
+                <div className="admin-module-empty">
+
+                  Loading modules...
+
+                </div>
+
+              ) : modules.length === 0 ? (
+
+                <div className="admin-module-empty">
+
+                  <FolderKanban
+                    size={28}
+                    strokeWidth={1.3}
+                  />
+
+                  <strong>
+                    No modules yet.
+                  </strong>
+
+                  <span>
+                    Create the first module
+                    and assign a developer.
+                  </span>
+
+                </div>
+
+              ) : (
+
+                modules.map(
+                  module => (
+
+                    <article
+                      key={module.id}
+                      className="admin-module-card"
+                    >
+
+                      <div className="admin-module-card-head">
+
+                        <div>
+
+                          <span>
+                            MODULE /
+                            {" "}
+                            {String(
+                              module.id
+                            ).padStart(
+                              3,
+                              "0"
+                            )}
+                          </span>
+
+                          <h3>
+                            {module.moduleName}
+                          </h3>
+
+                        </div>
+
+
+                        <span
+                          className={
+                            `admin-module-status ${
+                              (
+                                module.status ||
+                                "ASSIGNED"
+                              )
+                                .toLowerCase()
+                                .replaceAll(
+                                  "_",
+                                  "-"
+                                )
+                            }`
+                          }
+                        >
+
+                          {formatStatus(
+                            module.status
+                          )}
+
+                        </span>
+
+                      </div>
+
+
+                      {module.description && (
+
+                        <p className="admin-module-description">
+
+                          {
+                            module.description
+                          }
+
+                        </p>
+
+                      )}
+
+
+                      <div className="admin-module-meta">
+
+                        <div>
+
+                          <UserRound
+                            size={14}
+                          />
+
+                          <span>
+
+                            {
+                              module.developerName
+                            }
+
+                          </span>
+
+                        </div>
+
+
+                        <div>
+
+                          <GitBranch
+                            size={14}
+                          />
+
+                          <span>
+
+                            {
+                              module.branchName
+                            }
+
+                          </span>
+
+                        </div>
+
+
+                        <div>
+
+                          <CalendarDays
+                            size={14}
+                          />
+
+                          <span>
+
+                            {formatDate(
+                              module.deadline
+                            )}
+
+                          </span>
+
+                        </div>
+
+                      </div>
+
+
+                      <div className="admin-module-card-footer">
+
+                        <span
+                          className={
+                            `admin-module-priority ${
+                              (
+                                module.priority ||
+                                "MEDIUM"
+                              ).toLowerCase()
+                            }`
+                          }
+                        >
+
+                          {
+                            module.priority ||
+                            "MEDIUM"
+                          }
+
+                        </span>
+
+
+                        <span>
+                          Base:
+                          {" "}
+                          {
+                            module.baseBranch ||
+                            "develop"
+                          }
+                        </span>
+
+                      </div>
+
+                    </article>
+
+                  )
+                )
+
+              )}
+
+            </div>
+
+          </aside>
+
+        </div>
+
+      )}
 
     </div>
 

@@ -5,6 +5,8 @@ import com.faldren.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.http.HttpMethod;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
@@ -24,12 +26,14 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter
+            jwtAuthenticationFilter;
 
 
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
+
         this.jwtAuthenticationFilter =
                 jwtAuthenticationFilter;
     }
@@ -41,6 +45,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 
@@ -56,9 +61,18 @@ public class SecurityConfig {
 
         http
 
+                // ==================================
+                // CSRF
+                // ==================================
+
                 .csrf(csrf ->
                         csrf.disable()
                 )
+
+
+                // ==================================
+                // CORS
+                // ==================================
 
                 .cors(cors ->
                         cors.configurationSource(
@@ -66,28 +80,86 @@ public class SecurityConfig {
                         )
                 )
 
+
+                // ==================================
+                // STATELESS JWT
+                // ==================================
+
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
+
+                // ==================================
+                // ROUTE SECURITY
+                // ==================================
+
                 .authorizeHttpRequests(auth -> auth
 
-                        // --------------------------
-                        // PUBLIC AUTH ENDPOINTS
-                        // --------------------------
+
+                        // ==================================
+                        // PREFLIGHT
+                        // ==================================
 
                         .requestMatchers(
-                                "/api/admin/auth/login",
-                                "/api/client/auth/**"
+                                HttpMethod.OPTIONS,
+                                "/**"
                         )
                         .permitAll()
 
 
-                        // --------------------------
+                        // ==================================
+                        // PUBLIC ADMIN AUTH
+                        // ==================================
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/admin/auth/login"
+                        )
+                        .permitAll()
+
+
+                        // ==================================
+                        // PUBLIC CLIENT AUTH
+                        // ==================================
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+
+                                "/api/client/auth/send-otp",
+                                "/api/client/auth/verify-otp",
+                                "/api/client/auth/register",
+                                "/api/client/auth/login"
+                        )
+                        .permitAll()
+
+
+                        // ==================================
+                        // PUBLIC DEVELOPER AUTH
+                        // ==================================
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/developer/auth/login"
+                        )
+                        .permitAll()
+
+
+                        // ==================================
+                        // SPRING ERROR HANDLER
+                        // ==================================
+
+                        .requestMatchers(
+                                "/error"
+                        )
+                        .permitAll()
+
+
+                        // ==================================
                         // ADMIN ONLY
-                        // --------------------------
+                        // ==================================
 
                         .requestMatchers(
                                 "/api/admin/**"
@@ -95,9 +167,9 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
 
 
-                        // --------------------------
+                        // ==================================
                         // CLIENT ONLY
-                        // --------------------------
+                        // ==================================
 
                         .requestMatchers(
                                 "/api/client/**"
@@ -105,13 +177,28 @@ public class SecurityConfig {
                         .hasRole("CLIENT")
 
 
-                        // --------------------------
-                        // OTHER ROUTES
-                        // --------------------------
+                        // ==================================
+                        // DEVELOPER ONLY
+                        // ==================================
+
+                        .requestMatchers(
+                                "/api/developer/**"
+                        )
+                        .hasRole("DEVELOPER")
+
+
+                        // ==================================
+                        // EVERYTHING ELSE = BLOCK
+                        // ==================================
 
                         .anyRequest()
-                        .permitAll()
+                        .denyAll()
                 )
+
+
+                // ==================================
+                // JWT FILTER
+                // ==================================
 
                 .addFilterBefore(
                         jwtAuthenticationFilter,
@@ -128,7 +215,8 @@ public class SecurityConfig {
     // ==========================================
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource
+    corsConfigurationSource() {
 
         CorsConfiguration configuration =
                 new CorsConfiguration();
@@ -154,12 +242,15 @@ public class SecurityConfig {
 
 
         configuration.setAllowedHeaders(
-                List.of("*")
+                List.of(
+                        "Authorization",
+                        "Content-Type"
+                )
         );
 
 
         configuration.setAllowCredentials(
-                true
+                false
         );
 
 
