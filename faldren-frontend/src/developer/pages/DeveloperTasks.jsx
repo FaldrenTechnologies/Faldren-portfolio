@@ -677,7 +677,7 @@ function DeveloperTasks() {
 
   return (
 
-    <div className="admin-dashboard">
+    <div className="admin-dashboard developer-portal">
 
       <DeveloperSidebar />
 

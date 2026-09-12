@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import HomeLoader from "./admin/components/HomeLoader";
 
 import {
   ArrowUpRight,
@@ -176,13 +177,25 @@ const whyFaldren = [
 /* =========================================================
    APP
 ========================================================= */
-
+let faldrenIntroPlayed = false;
 function App() {
   const navigate = useNavigate();
 
   // existing code...
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [submitted, setSubmitted] = React.useState(false);
+
+  const [showIntro, setShowIntro] =
+  React.useState(() => {
+
+    if (faldrenIntroPlayed) {
+      return false;
+    }
+
+    faldrenIntroPlayed = true;
+
+    return true;
+  });
 
   const appRef = React.useRef(null);
   const lenisRef = React.useRef(null);
@@ -1458,63 +1471,76 @@ viewport.removeEventListener(
       );
 
 
-      gsap.from(
-        '.project-form-wrap',
-        {
+      /* ===================================================
+   PROJECT FORM — ONLY IF PRESENT
+=================================================== */
 
-          y: 90,
+const projectFormWrap =
+  document.querySelector(
+    '.project-form-wrap'
+  );
 
-          x: 55,
+const projectForm =
+  document.querySelector(
+    '.project-form'
+  );
 
-          rotate: 2.5,
-
-          scale: 0.95,
-
-          opacity: 0,
-
-          duration: 1.3,
-
-          ease:
-            'power4.out',
-
-          scrollTrigger: {
-
-            trigger:
-              '.project-form-wrap',
-
-            start:
-              'top 80%'
-
-          }
-
-        }
-      );
+const formFields =
+  document.querySelectorAll(
+    '.form-field'
+  );
 
 
-      gsap.from(
-        '.form-field',
-        {
+if (projectFormWrap) {
 
-          y: 24,
+  gsap.from(
+    projectFormWrap,
+    {
+      y: 90,
+      x: 55,
+      rotate: 2.5,
+      scale: 0.95,
+      opacity: 0,
+      duration: 1.3,
+      ease: 'power4.out',
 
-          opacity: 0,
+      scrollTrigger: {
+        trigger:
+          projectFormWrap,
 
-          stagger: 0.065,
+        start:
+          'top 80%'
+      }
+    }
+  );
 
-          duration: 0.65,
+}
 
-          scrollTrigger: {
 
-            trigger:
-              '.project-form',
+if (
+  projectForm &&
+  formFields.length > 0
+) {
 
-            start:
-              'top 83%'
+  gsap.from(
+    formFields,
+    {
+      y: 24,
+      opacity: 0,
+      stagger: 0.065,
+      duration: 0.65,
 
-          }
+      scrollTrigger: {
+        trigger:
+          projectForm,
 
-        }
-      );
+        start:
+          'top 83%'
+      }
+    }
+  );
+
+}
 
 
 
@@ -2234,6 +2260,16 @@ viewport.removeEventListener(
   ======================================================= */
 
   return (
+
+    <>
+
+    {showIntro && (
+      <HomeLoader
+        onFinish={() => {
+          setShowIntro(false);
+        }}
+      />
+    )}
 
     <div
       ref={appRef}
@@ -3009,6 +3045,8 @@ viewport.removeEventListener(
 
     </div>
 
+    </>
+
   );
 
 }
@@ -3256,4 +3294,5 @@ ReactDOM
       </Routes>
 
     </BrowserRouter>
+    
   );

@@ -4686,3 +4686,4133 @@
 
   cursor: not-allowed;
 }
+
+/* =========================================================
+   FALDREN — FINAL UI POLISH
+   SAME THEME / NO LAYOUT CHANGE
+========================================================= */
+
+
+/* =========================================================
+   1. TEXTBOX / PLACEHOLDER READABILITY
+========================================================= */
+
+.admin-dashboard input,
+.admin-dashboard textarea,
+.admin-dashboard select {
+  color: #191a16;
+  opacity: 1;
+  caret-color: #191a16;
+}
+
+
+.admin-dashboard input::placeholder,
+.admin-dashboard textarea::placeholder {
+  color: #777168;
+  opacity: 1;
+}
+
+
+/* CLIENT SEARCH */
+
+.admin-client-search input::placeholder {
+  color: #777168;
+  opacity: 1;
+}
+
+
+/* PROJECT SEARCH */
+
+.admin-project-search input::placeholder {
+  color: #777168;
+  opacity: 1;
+}
+
+
+/* REQUEST SEARCH */
+
+.admin-request-search input::placeholder {
+  color: #777168;
+  opacity: 1;
+}
+
+
+/* MODULE FORM */
+
+.admin-module-field input,
+.admin-module-field textarea,
+.admin-module-field select {
+  color: #191a16;
+}
+
+
+.admin-module-field input::placeholder,
+.admin-module-field textarea::placeholder {
+  color: #777168;
+  opacity: 1;
+}
+
+
+.admin-module-field label {
+  opacity: .82;
+}
+
+
+/* DEVELOPER MODAL */
+
+.admin-developer-field input {
+  color: #191a16;
+}
+
+
+.admin-developer-field input::placeholder {
+  color: #777168;
+  opacity: 1;
+}
+
+
+/* PROJECT MODAL */
+
+.admin-project-form-field input::placeholder {
+  color: #777168;
+  opacity: 1;
+}
+
+
+/* LOGIN IS DARK — KEEP DARK THEME */
+
+.admin-login-panel input::placeholder {
+  color: #98968c;
+  opacity: 1;
+}
+
+
+/* =========================================================
+   2. SMOOTH FOCUS
+========================================================= */
+
+.admin-dashboard input,
+.admin-dashboard textarea,
+.admin-dashboard select,
+.admin-login-panel input {
+  transition:
+    border-color .22s ease,
+    background-color .22s ease,
+    box-shadow .22s ease;
+}
+
+
+.admin-module-field input:focus,
+.admin-module-field textarea:focus,
+.admin-module-field select:focus,
+.admin-developer-field input:focus,
+.admin-project-form-field input:focus,
+.admin-project-form-field select:focus {
+  border-color: #686a52;
+}
+
+
+/* =========================================================
+   3. PAGE ENTER ANIMATION
+========================================================= */
+
+@keyframes faldrenPageEnter {
+
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+
+.admin-topbar {
+  animation:
+    faldrenPageEnter
+    .38s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+.admin-welcome,
+.admin-clients-intro,
+.admin-projects-intro,
+.admin-requests-intro {
+  animation:
+    faldrenPageEnter
+    .46s
+    .04s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+/* =========================================================
+   4. SIDEBAR MICRO ANIMATION
+========================================================= */
+
+.admin-nav-item {
+  transition:
+    background .22s ease,
+    color .22s ease,
+    transform .22s ease;
+}
+
+
+.admin-nav-item:hover {
+  transform: translateX(2px);
+}
+
+
+.admin-nav-item:active {
+  transform: translateX(1px);
+}
+
+
+/* =========================================================
+   5. STAT CARDS
+========================================================= */
+
+.admin-stat-card,
+.admin-client-count {
+  transition:
+    transform .25s ease,
+    background-color .25s ease;
+}
+
+
+.admin-stat-card:hover {
+  transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   6. TABLE ROWS
+========================================================= */
+
+.admin-client-row,
+.admin-project-row,
+.admin-request-row {
+  transition:
+    background-color .22s ease,
+    transform .22s ease;
+}
+
+
+.admin-client-row:hover,
+.admin-project-row:hover,
+.admin-request-row:hover {
+  transform: translateX(2px);
+}
+
+
+/* =========================================================
+   7. MODULE / TASK CARDS
+========================================================= */
+
+.admin-module-card {
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+
+.admin-module-card:hover {
+  transform: translateY(-2px);
+
+  border-color:
+    rgba(25, 25, 22, .28);
+
+  box-shadow:
+    0 8px 24px
+    rgba(25, 26, 22, .035);
+}
+
+
+/* =========================================================
+   8. BUTTON MICRO INTERACTIONS
+========================================================= */
+
+.admin-add-client,
+.admin-create-project-btn,
+.admin-module-add-btn,
+.admin-module-save,
+.admin-project-save,
+.admin-developer-create,
+.developer-start-work-btn {
+  transition:
+    background-color .22s ease,
+    border-color .22s ease,
+    opacity .22s ease,
+    transform .22s ease;
+}
+
+
+.admin-add-client:hover,
+.admin-create-project-btn:hover,
+.admin-module-add-btn:hover,
+.admin-module-save:hover,
+.admin-project-save:hover,
+.admin-developer-create:hover,
+.developer-start-work-btn:hover {
+  transform: translateY(-1px);
+}
+
+
+.admin-add-client:active,
+.admin-create-project-btn:active,
+.admin-module-add-btn:active,
+.admin-module-save:active,
+.admin-project-save:active,
+.admin-developer-create:active,
+.developer-start-work-btn:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   9. ICON BUTTONS
+========================================================= */
+
+.admin-client-menu button,
+.admin-project-menu button,
+.admin-request-row-actions button,
+.admin-project-modal-close,
+.admin-module-drawer-head > button,
+.admin-module-form-head > button,
+.admin-developer-modal-head button {
+  transition:
+    background-color .2s ease,
+    color .2s ease,
+    transform .2s ease;
+}
+
+
+.admin-client-menu button:hover,
+.admin-project-menu button:hover,
+.admin-project-modal-close:hover,
+.admin-module-drawer-head > button:hover,
+.admin-module-form-head > button:hover,
+.admin-developer-modal-head button:hover {
+  transform: scale(1.04);
+}
+
+
+/* =========================================================
+   10. MODAL / DRAWER OPEN
+========================================================= */
+
+@keyframes faldrenBackdropIn {
+
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+
+}
+
+
+@keyframes faldrenModalIn {
+
+  from {
+    opacity: 0;
+    transform:
+      translateY(8px)
+      scale(.99);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+@keyframes faldrenDrawerIn {
+
+  from {
+    opacity: .6;
+    transform:
+      translateX(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateX(0);
+  }
+
+}
+
+
+.admin-developer-modal-backdrop,
+.admin-project-modal-backdrop,
+.admin-module-backdrop {
+  animation:
+    faldrenBackdropIn
+    .22s
+    ease
+    both;
+}
+
+
+.admin-developer-modal {
+  animation:
+    faldrenModalIn
+    .3s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+.admin-project-modal,
+.admin-module-drawer {
+  animation:
+    faldrenDrawerIn
+    .34s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+/* =========================================================
+   11. MODULE FORM REVEAL
+========================================================= */
+
+.admin-module-form {
+  animation:
+    faldrenPageEnter
+    .3s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+/* =========================================================
+   12. STATUS / PRIORITY
+========================================================= */
+
+.admin-module-status,
+.admin-module-priority,
+.admin-project-status,
+.admin-request-status,
+.admin-client-status {
+  transition:
+    opacity .2s ease,
+    transform .2s ease;
+}
+
+
+/* =========================================================
+   13. LINKS
+========================================================= */
+
+.admin-module-card a {
+  transition:
+    opacity .2s ease,
+    transform .2s ease;
+}
+
+
+.admin-module-card a:hover {
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   14. ACCESSIBILITY — REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .admin-dashboard *,
+  .admin-login-page * {
+    animation-duration:
+      .01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      .01ms !important;
+  }
+
+}
+/* =========================================================
+   FALDREN — UI POLISH V2
+   SAME THEME • STRONGER CONTRAST • VISIBLE MOTION
+========================================================= */
+
+
+/* =========================================================
+   1. GLOBAL READABILITY
+========================================================= */
+
+.admin-dashboard {
+  color: #191a16;
+}
+
+
+/* MAIN SECONDARY COPY */
+
+.admin-welcome p,
+.admin-clients-intro p,
+.admin-projects-intro p,
+.admin-requests-intro p,
+.admin-module-description {
+  color: #5f5b53;
+}
+
+
+/* SMALL LABELS */
+
+.admin-page-label,
+.admin-clients-kicker,
+.admin-projects-kicker,
+.admin-requests-kicker {
+  color: #62644d;
+}
+
+
+/* =========================================================
+   2. INPUTS / TEXTBOXES
+========================================================= */
+
+.admin-dashboard input,
+.admin-dashboard textarea,
+.admin-dashboard select {
+  color: #191a16;
+
+  opacity: 1;
+
+  caret-color: #191a16;
+}
+
+
+.admin-dashboard input::placeholder,
+.admin-dashboard textarea::placeholder {
+  color: #69655d;
+
+  opacity: 1;
+}
+
+
+/* SEARCH BOXES */
+
+.admin-client-search,
+.admin-project-search,
+.admin-request-search {
+  border-color:
+    rgba(25, 26, 22, .22);
+}
+
+
+.admin-client-search input::placeholder,
+.admin-project-search input::placeholder,
+.admin-request-search input::placeholder {
+  color: #69655d;
+
+  opacity: 1;
+}
+
+
+/* FILTER */
+
+.admin-project-filter,
+.admin-request-filter {
+  border-color:
+    rgba(25, 26, 22, .22);
+
+  color: #3f3d37;
+}
+
+
+/* =========================================================
+   3. TABLE CONTRAST
+========================================================= */
+
+.admin-clients-table-wrap,
+.admin-project-table,
+.admin-request-table {
+  border-top-color:
+    rgba(25, 26, 22, .22);
+
+  border-bottom-color:
+    rgba(25, 26, 22, .22);
+}
+
+
+/* TABLE HEAD */
+
+.admin-clients-table-head,
+.admin-project-table-head,
+.admin-request-table-head {
+  color: #625f57;
+
+  border-bottom-color:
+    rgba(25, 26, 22, .22);
+}
+
+
+/* ROW LINES */
+
+.admin-client-row,
+.admin-project-row,
+.admin-request-row {
+  border-bottom-color:
+    rgba(25, 26, 22, .16);
+}
+
+
+/* MAIN ROW TEXT */
+
+.admin-client-person strong,
+.admin-project-name strong,
+.admin-request-person strong {
+  color: #191a16;
+}
+
+
+/* SECONDARY ROW TEXT */
+
+.admin-client-person span,
+.admin-project-name span,
+.admin-request-person span,
+.admin-client-contact span,
+.admin-project-date,
+.admin-request-date {
+  color: #625f57;
+}
+
+
+/* COMPANY / SERVICE / BUDGET */
+
+.admin-client-company,
+.admin-project-client,
+.admin-request-service,
+.admin-request-budget {
+  color: #47453f;
+}
+
+
+/* =========================================================
+   4. REQUEST PAGE — SCREENSHOT SPECIFIC
+========================================================= */
+
+.admin-request-table-head {
+  color: #5e5b54;
+}
+
+
+.admin-request-row {
+  color: #25251f;
+}
+
+
+.admin-request-status {
+  opacity: 1;
+}
+
+
+.admin-request-status.accepted {
+  color: #51583f;
+}
+
+
+.admin-request-status.rejected {
+  color: #805447;
+}
+
+
+.admin-request-status.pending {
+  color: #685f43;
+}
+
+
+/* VIEW BUTTON */
+
+.admin-request-view {
+  border-color:
+    rgba(25, 26, 22, .22);
+
+  color: #45433d;
+}
+
+
+/* =========================================================
+   5. MODULE / TASK READABILITY
+========================================================= */
+
+.admin-module-card {
+  border-color:
+    rgba(25, 25, 22, .24);
+}
+
+
+.admin-module-card-head > div > span {
+  color: #666158;
+}
+
+
+.admin-module-description {
+  opacity: 1;
+}
+
+
+.admin-module-meta > div {
+  color: #555249;
+
+  opacity: 1;
+}
+
+
+.admin-module-card-footer {
+  color: #555249;
+
+  opacity: 1;
+}
+
+
+.admin-module-list-title span {
+  color: #625f57;
+
+  opacity: 1;
+}
+
+
+.admin-module-empty span {
+  color: #69655d;
+
+  opacity: 1;
+}
+
+
+/* MODULE FORM */
+
+.admin-module-field label {
+  color: #5b574f;
+
+  opacity: 1;
+}
+
+
+.admin-module-field input,
+.admin-module-field textarea,
+.admin-module-field select {
+  color: #191a16;
+
+  border-color:
+    rgba(25, 25, 22, .30);
+}
+
+
+.admin-module-field input::placeholder,
+.admin-module-field textarea::placeholder {
+  color: #716d64;
+
+  opacity: 1;
+}
+
+
+/* =========================================================
+   6. DEVELOPER FORM READABILITY
+========================================================= */
+
+.admin-developer-field label {
+  color: #4f4c45;
+}
+
+
+.admin-developer-field input {
+  color: #191a16;
+
+  border-color:
+    rgba(20, 20, 20, .34);
+}
+
+
+.admin-developer-field input::placeholder {
+  color: #716d64;
+
+  opacity: 1;
+}
+
+
+/* =========================================================
+   7. PROJECT FORM READABILITY
+========================================================= */
+
+.admin-project-form-field label {
+  color: #5b574f;
+}
+
+
+.admin-project-form-field input,
+.admin-project-form-field select {
+  border-color:
+    rgba(25, 26, 22, .24);
+}
+
+
+.admin-project-form-field input::placeholder {
+  color: #716d64;
+
+  opacity: 1;
+}
+
+
+/* =========================================================
+   8. DARK LOGIN PLACEHOLDER
+========================================================= */
+
+.admin-login-panel input::placeholder {
+  color: #aaa89d;
+
+  opacity: 1;
+}
+
+
+/* =========================================================
+   9. STRONGER PAGE ENTER
+========================================================= */
+
+@keyframes faldrenPageReveal {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translateY(18px);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+
+}
+
+
+.admin-topbar {
+  animation:
+    faldrenPageReveal
+    .55s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+.admin-welcome,
+.admin-clients-intro,
+.admin-projects-intro,
+.admin-requests-intro {
+  animation:
+    faldrenPageReveal
+    .65s
+    .08s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+/* =========================================================
+   10. SEARCH / ACTION BAR REVEAL
+========================================================= */
+
+.admin-client-actions,
+.admin-project-actions,
+.admin-request-actions {
+  animation:
+    faldrenPageReveal
+    .6s
+    .16s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+/* =========================================================
+   11. TABLE HEADER REVEAL
+========================================================= */
+
+.admin-clients-table-head,
+.admin-project-table-head,
+.admin-request-table-head {
+  animation:
+    faldrenPageReveal
+    .55s
+    .20s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+/* =========================================================
+   12. TABLE ROW STAGGER
+========================================================= */
+
+.admin-client-row,
+.admin-project-row,
+.admin-request-row {
+  opacity: 0;
+
+  animation:
+    faldrenRowReveal
+    .58s
+    cubic-bezier(.22, 1, .36, 1)
+    forwards;
+}
+
+
+@keyframes faldrenRowReveal {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+
+}
+
+
+.admin-client-row:nth-child(2),
+.admin-project-row:nth-child(2),
+.admin-request-row:nth-child(2) {
+  animation-delay: .24s;
+}
+
+
+.admin-client-row:nth-child(3),
+.admin-project-row:nth-child(3),
+.admin-request-row:nth-child(3) {
+  animation-delay: .31s;
+}
+
+
+.admin-client-row:nth-child(4),
+.admin-project-row:nth-child(4),
+.admin-request-row:nth-child(4) {
+  animation-delay: .38s;
+}
+
+
+.admin-client-row:nth-child(5),
+.admin-project-row:nth-child(5),
+.admin-request-row:nth-child(5) {
+  animation-delay: .45s;
+}
+
+
+.admin-client-row:nth-child(6),
+.admin-project-row:nth-child(6),
+.admin-request-row:nth-child(6) {
+  animation-delay: .52s;
+}
+
+
+.admin-client-row:nth-child(n+7),
+.admin-project-row:nth-child(n+7),
+.admin-request-row:nth-child(n+7) {
+  animation-delay: .58s;
+}
+
+
+/* =========================================================
+   13. ROW HOVER
+========================================================= */
+
+.admin-client-row,
+.admin-project-row,
+.admin-request-row {
+  transition:
+    background-color .25s ease,
+    transform .25s ease;
+}
+
+
+.admin-client-row:hover,
+.admin-project-row:hover,
+.admin-request-row:hover {
+  background:
+    rgba(248, 243, 233, .80);
+
+  transform:
+    translateX(4px);
+}
+
+
+/* =========================================================
+   14. SIDEBAR MOTION
+========================================================= */
+
+.admin-nav-item {
+  transition:
+    background .25s ease,
+    color .25s ease,
+    transform .25s
+    cubic-bezier(.22, 1, .36, 1);
+}
+
+
+.admin-nav-item:hover {
+  transform:
+    translateX(5px);
+}
+
+
+.admin-nav-item svg {
+  transition:
+    transform .25s
+    cubic-bezier(.22, 1, .36, 1);
+}
+
+
+.admin-nav-item:hover svg {
+  transform:
+    scale(1.08);
+}
+
+
+/* ACTIVE ITEM SHOULD NOT MOVE */
+
+.admin-nav-item.active:hover {
+  transform:
+    translateX(2px);
+}
+
+
+/* =========================================================
+   15. MODULE CARDS REVEAL
+========================================================= */
+
+.admin-module-card {
+  animation:
+    faldrenCardReveal
+    .58s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+
+  transition:
+    transform .28s ease,
+    border-color .28s ease,
+    box-shadow .28s ease;
+}
+
+
+@keyframes faldrenCardReveal {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(18px)
+      scale(.995);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+.admin-module-card:hover {
+  transform:
+    translateY(-4px);
+
+  border-color:
+    rgba(25, 25, 22, .34);
+
+  box-shadow:
+    0 12px 30px
+    rgba(25, 26, 22, .055);
+}
+
+
+/* =========================================================
+   16. BUTTON MOTION
+========================================================= */
+
+.admin-add-client,
+.admin-create-project-btn,
+.admin-module-add-btn,
+.admin-module-save,
+.admin-project-save,
+.admin-developer-create,
+.developer-start-work-btn {
+  transition:
+    background-color .25s ease,
+    border-color .25s ease,
+    opacity .25s ease,
+    transform .25s
+    cubic-bezier(.22, 1, .36, 1);
+}
+
+
+.admin-add-client:hover,
+.admin-create-project-btn:hover,
+.admin-module-add-btn:hover,
+.admin-module-save:hover,
+.admin-project-save:hover,
+.admin-developer-create:hover,
+.developer-start-work-btn:hover {
+  transform:
+    translateY(-3px);
+}
+
+
+.admin-add-client:active,
+.admin-create-project-btn:active,
+.admin-module-add-btn:active,
+.admin-module-save:active,
+.admin-project-save:active,
+.admin-developer-create:active,
+.developer-start-work-btn:active {
+  transform:
+    translateY(0)
+    scale(.98);
+}
+
+
+/* =========================================================
+   17. ACTION ICON BUTTONS
+========================================================= */
+
+.admin-client-menu button,
+.admin-project-menu button,
+.admin-request-row-actions button {
+  transition:
+    background-color .22s ease,
+    color .22s ease,
+    transform .22s ease;
+}
+
+
+.admin-client-menu button:hover,
+.admin-project-menu button:hover,
+.admin-request-row-actions button:hover {
+  transform:
+    translateY(-2px)
+    scale(1.05);
+}
+
+
+/* =========================================================
+   18. MODAL BACKDROP
+========================================================= */
+
+@keyframes faldrenBackdrop {
+
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+
+}
+
+
+.admin-project-modal-backdrop,
+.admin-developer-modal-backdrop,
+.admin-module-backdrop {
+  animation:
+    faldrenBackdrop
+    .28s
+    ease
+    both;
+}
+
+
+/* =========================================================
+   19. CENTER MODAL
+========================================================= */
+
+@keyframes faldrenModalReveal {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(20px)
+      scale(.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+.admin-developer-modal {
+  animation:
+    faldrenModalReveal
+    .4s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+/* =========================================================
+   20. SIDE DRAWERS
+========================================================= */
+
+@keyframes faldrenDrawerReveal {
+
+  from {
+    opacity: .4;
+
+    transform:
+      translateX(45px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+
+}
+
+
+.admin-project-modal,
+.admin-module-drawer {
+  animation:
+    faldrenDrawerReveal
+    .48s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+/* =========================================================
+   21. FORM REVEAL
+========================================================= */
+
+.admin-module-form {
+  animation:
+    faldrenPageReveal
+    .45s
+    cubic-bezier(.22, 1, .36, 1)
+    both;
+}
+
+
+/* =========================================================
+   22. INPUT FOCUS
+========================================================= */
+
+.admin-module-field input,
+.admin-module-field textarea,
+.admin-module-field select,
+.admin-developer-field input,
+.admin-project-form-field input,
+.admin-project-form-field select {
+  transition:
+    border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+
+.admin-module-field input:focus,
+.admin-module-field textarea:focus,
+.admin-module-field select:focus,
+.admin-developer-field input:focus,
+.admin-project-form-field input:focus,
+.admin-project-form-field select:focus {
+  border-color:
+    #686a52;
+
+  box-shadow:
+    0 0 0 1px
+    rgba(104, 106, 82, .12);
+}
+
+
+/* =========================================================
+   23. REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .admin-dashboard *,
+  .admin-login-page * {
+    animation:
+      none !important;
+
+    transition-duration:
+      .01ms !important;
+  }
+
+}
+/* =========================================================
+   FALDREN — FINAL CONTRAST PATCH
+   SAME THEME / ONLY DARKER READABILITY
+========================================================= */
+
+
+/* TABLE OUTER LINES */
+
+.admin-clients-table-wrap,
+.admin-project-table,
+.admin-request-table {
+  border-top:
+    1px solid rgba(25, 26, 22, .34) !important;
+
+  border-bottom:
+    1px solid rgba(25, 26, 22, .34) !important;
+}
+
+
+/* TABLE HEADER */
+
+.admin-clients-table-head,
+.admin-project-table-head,
+.admin-request-table-head {
+  color:
+    #4f4c45 !important;
+
+  border-bottom:
+    1px solid rgba(25, 26, 22, .30) !important;
+
+  opacity: 1 !important;
+}
+
+
+.admin-clients-table-head span,
+.admin-project-table-head span,
+.admin-request-table-head span {
+  color:
+    #4f4c45 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* ROW DIVIDERS */
+
+.admin-client-row,
+.admin-project-row,
+.admin-request-row {
+  border-bottom:
+    1px solid rgba(25, 26, 22, .24) !important;
+
+  color:
+    #191a16 !important;
+}
+
+
+/* PRIMARY CONTENT */
+
+.admin-client-person strong,
+.admin-project-name strong,
+.admin-request-person strong {
+  color:
+    #191a16 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* SECONDARY CONTENT */
+
+.admin-client-person span,
+.admin-project-name span,
+.admin-request-person span,
+.admin-client-contact span,
+.admin-project-date,
+.admin-request-date {
+  color:
+    #555249 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* COMPANY / SERVICE / BUDGET */
+
+.admin-client-company,
+.admin-project-client,
+.admin-request-service,
+.admin-request-budget {
+  color:
+    #3f3d37 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* REQUEST STATUS */
+
+.admin-request-status {
+  opacity: 1 !important;
+
+  font-weight: 600 !important;
+}
+
+
+.admin-request-status.accepted {
+  color:
+    #4f563c !important;
+}
+
+
+.admin-request-status.pending {
+  color:
+    #655c40 !important;
+}
+
+
+.admin-request-status.rejected {
+  color:
+    #7a4f43 !important;
+}
+
+
+/* DATE ICON + TEXT */
+
+.admin-request-date,
+.admin-project-date {
+  color:
+    #555249 !important;
+}
+
+
+.admin-request-date svg,
+.admin-project-date svg {
+  color:
+    #555249 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* SEARCH BOX */
+
+.admin-client-search,
+.admin-project-search,
+.admin-request-search {
+  border:
+    1px solid rgba(25, 26, 22, .30) !important;
+}
+
+
+.admin-client-search input,
+.admin-project-search input,
+.admin-request-search input {
+  color:
+    #191a16 !important;
+
+  opacity: 1 !important;
+}
+
+
+.admin-client-search input::placeholder,
+.admin-project-search input::placeholder,
+.admin-request-search input::placeholder {
+  color:
+    #5f5b53 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* FILTER */
+
+.admin-project-filter,
+.admin-request-filter {
+  color:
+    #35342f !important;
+
+  border-color:
+    rgba(25, 26, 22, .30) !important;
+
+  opacity: 1 !important;
+}
+
+
+/* VIEW / ACTION BUTTON */
+
+.admin-request-view {
+  color:
+    #3f3d37 !important;
+
+  border-color:
+    rgba(25, 26, 22, .30) !important;
+}
+
+
+.admin-request-view svg {
+  opacity: 1 !important;
+}
+
+
+/* MODULE / DEVELOPER TASK CONTENT */
+
+.admin-module-card {
+  border-color:
+    rgba(25, 26, 22, .30) !important;
+}
+
+
+.admin-module-card-head span,
+.admin-module-description,
+.admin-module-meta,
+.admin-module-meta > div,
+.admin-module-card-footer,
+.admin-module-list-title span {
+  color:
+    #4f4c45 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* FORM LABELS */
+
+.admin-module-field label,
+.admin-project-form-field label,
+.admin-developer-field label {
+  color:
+    #4f4c45 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* FORM INPUTS */
+
+.admin-module-field input,
+.admin-module-field textarea,
+.admin-module-field select,
+.admin-project-form-field input,
+.admin-project-form-field select,
+.admin-developer-field input {
+  color:
+    #191a16 !important;
+
+  border-color:
+    rgba(25, 26, 22, .32) !important;
+
+  opacity: 1 !important;
+}
+
+
+/* ALL LIGHT PAGE TEXT */
+
+.admin-welcome p,
+.admin-clients-intro p,
+.admin-projects-intro p,
+.admin-requests-intro p {
+  color:
+    #5b574f !important;
+
+  opacity: 1 !important;
+}
+/* =========================================================
+   DASHBOARD — RECENT PROJECTS TEXT CONTRAST
+========================================================= */
+
+
+/* Website / PLANNING */
+
+.admin-recent-projects span {
+  color: #4f4c45 !important;
+  opacity: 1 !important;
+}
+
+
+/* Due date / small project information */
+
+.admin-recent-projects p,
+.admin-recent-projects small {
+  color: #555249 !important;
+  opacity: 1 !important;
+}
+
+
+/* Project names remain strong */
+
+.admin-recent-projects h3,
+.admin-recent-projects h4,
+.admin-recent-projects strong {
+  color: #191a16 !important;
+  opacity: 1 !important;
+}
+
+
+/* Recent project row/card separators */
+
+.admin-recent-projects article,
+.admin-recent-projects li {
+  border-color:
+    rgba(25, 26, 22, .22) !important;
+}
+
+
+/* =========================================================
+   DASHBOARD — ACTIVITY TEXT CONTRAST
+========================================================= */
+
+.admin-activity span,
+.admin-activity p,
+.admin-activity small {
+  color: #555249 !important;
+  opacity: 1 !important;
+}
+
+
+.admin-activity strong,
+.admin-activity h3,
+.admin-activity h4 {
+  color: #191a16 !important;
+  opacity: 1 !important;
+}
+/* =========================================================
+   FALDREN ADMIN — FULL MOBILE RESPONSIVE
+   DESKTOP UNCHANGED
+========================================================= */
+
+
+/* =========================================================
+   TABLET — 900px
+========================================================= */
+
+@media (max-width: 900px) {
+
+  /* ================= MAIN SHELL ================= */
+
+  .admin-dashboard {
+    display: block !important;
+    min-height: 100vh !important;
+  }
+
+
+  /* ================= SIDEBAR -> TOP BAR ================= */
+
+  .admin-sidebar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1500 !important;
+
+    width: 100% !important;
+    height: auto !important;
+
+    padding: 14px 18px !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      auto
+      1fr
+      auto !important;
+
+    align-items: center !important;
+
+    gap: 18px !important;
+
+    background: #151611 !important;
+  }
+
+
+  .admin-sidebar > div:first-child {
+    min-width: max-content !important;
+  }
+
+
+  .admin-sidebar-brand {
+    font-size: 15px !important;
+  }
+
+
+  .admin-sidebar-label {
+    margin-top: 3px !important;
+
+    font-size: 6px !important;
+  }
+
+
+  /* ================= NAV HORIZONTAL ================= */
+
+  .admin-sidebar-nav {
+    margin-top: 0 !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+
+    gap: 4px !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    scrollbar-width: none !important;
+  }
+
+
+  .admin-sidebar-nav::-webkit-scrollbar {
+    display: none !important;
+  }
+
+
+  .admin-nav-item {
+    flex: 0 0 auto !important;
+
+    width: auto !important;
+
+    min-height: 40px !important;
+
+    padding: 0 13px !important;
+
+    white-space: nowrap !important;
+  }
+
+
+  .admin-nav-item:hover {
+    transform: none !important;
+  }
+
+
+  /* ================= SIDEBAR BOTTOM ================= */
+
+  .admin-sidebar-bottom {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+
+    border-top: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 4px !important;
+  }
+
+
+  .admin-sidebar-bottom .admin-nav-item {
+    width: 40px !important;
+
+    min-width: 40px !important;
+
+    padding: 0 !important;
+
+    justify-content: center !important;
+  }
+
+
+  .admin-sidebar-bottom .admin-nav-item span {
+    display: none !important;
+  }
+
+
+  /* ================= MAIN ================= */
+
+  .admin-main {
+    width: 100% !important;
+
+    padding:
+      30px
+      28px
+      65px !important;
+  }
+
+
+  /* ================= TOPBAR ================= */
+
+  .admin-topbar {
+    gap: 20px !important;
+  }
+
+
+  .admin-topbar h1 {
+    font-size: 29px !important;
+  }
+
+
+  /* ================= INTRO SECTIONS ================= */
+
+  .admin-welcome,
+  .admin-clients-intro,
+  .admin-projects-intro,
+  .admin-requests-intro {
+    padding:
+      50px
+      0
+      42px !important;
+  }
+
+
+  .admin-welcome h2,
+  .admin-clients-intro h2,
+  .admin-projects-intro h2,
+  .admin-requests-intro h2 {
+    font-size:
+      clamp(
+        43px,
+        7vw,
+        62px
+      ) !important;
+  }
+
+
+  /* ================= DASHBOARD STATS ================= */
+
+  .admin-stats {
+    grid-template-columns:
+      1fr
+      1fr !important;
+  }
+
+
+  .admin-stat-card {
+    min-height: 165px !important;
+  }
+
+
+  /* ================= DASHBOARD LOWER AREA ================= */
+
+  .admin-dashboard-grid {
+    grid-template-columns:
+      1fr !important;
+
+    margin-top: 45px !important;
+  }
+
+
+  /* ================= ACTION BARS ================= */
+
+  .admin-client-actions,
+  .admin-project-actions,
+  .admin-request-actions {
+    flex-direction: column !important;
+
+    align-items: stretch !important;
+  }
+
+
+  .admin-client-search,
+  .admin-project-search,
+  .admin-request-search {
+    width: 100% !important;
+  }
+
+
+  .admin-project-action-right {
+    width: 100% !important;
+  }
+
+
+  .admin-project-filter,
+  .admin-request-filter,
+  .admin-create-project-btn,
+  .admin-add-client {
+    width: 100% !important;
+  }
+
+
+  /* ================= MODULE META ================= */
+
+  .admin-module-meta {
+    grid-template-columns:
+      1fr
+      1fr !important;
+  }
+
+}
+
+
+
+/* =========================================================
+   MOBILE — 650px
+========================================================= */
+
+@media (max-width: 650px) {
+
+  /* ================= TOP ADMIN HEADER ================= */
+
+  .admin-sidebar {
+    grid-template-columns:
+      1fr
+      auto !important;
+
+    grid-template-areas:
+      "brand actions"
+      "nav nav" !important;
+
+    padding:
+      13px
+      14px
+      10px !important;
+
+    gap: 10px !important;
+  }
+
+
+  .admin-sidebar > div:first-child {
+    grid-area: brand !important;
+  }
+
+
+  .admin-sidebar-nav {
+    grid-area: nav !important;
+
+    width:
+      calc(100vw - 28px) !important;
+  }
+
+
+  .admin-sidebar-bottom {
+    grid-area: actions !important;
+  }
+
+
+  .admin-nav-item {
+    min-height: 38px !important;
+
+    padding:
+      0
+      12px !important;
+
+    font-size: 10px !important;
+
+    gap: 7px !important;
+  }
+
+
+  .admin-nav-item svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+
+  /* ================= MAIN ================= */
+
+  .admin-main {
+    padding:
+      25px
+      16px
+      55px !important;
+  }
+
+
+  /* ================= TOPBAR ================= */
+
+  .admin-topbar {
+    align-items: center !important;
+
+    padding-bottom:
+      22px !important;
+  }
+
+
+  .admin-page-label {
+    font-size: 7px !important;
+  }
+
+
+  .admin-topbar h1 {
+    margin-top:
+      7px !important;
+
+    font-size:
+      26px !important;
+  }
+
+
+  .admin-profile-copy {
+    display: none !important;
+  }
+
+
+  .admin-avatar {
+    width: 37px !important;
+    height: 37px !important;
+  }
+
+
+  /* ================= INTRO ================= */
+
+  .admin-welcome,
+  .admin-clients-intro,
+  .admin-projects-intro,
+  .admin-requests-intro {
+    padding:
+      40px
+      0
+      34px !important;
+
+    flex-direction: column !important;
+
+    align-items:
+      flex-start !important;
+
+    gap: 28px !important;
+  }
+
+
+  .admin-welcome h2,
+  .admin-clients-intro h2,
+  .admin-projects-intro h2,
+  .admin-requests-intro h2 {
+    font-size:
+      clamp(
+        39px,
+        12vw,
+        52px
+      ) !important;
+
+    line-height:
+      .96 !important;
+  }
+
+
+  .admin-welcome p,
+  .admin-clients-intro p,
+  .admin-projects-intro p,
+  .admin-requests-intro p {
+    font-size:
+      12px !important;
+
+    line-height:
+      1.6 !important;
+  }
+
+
+  /* COUNTS */
+
+  .admin-client-count,
+  .admin-project-count,
+  .admin-request-count {
+    align-items:
+      flex-start !important;
+  }
+
+
+  .admin-client-count strong,
+  .admin-project-count strong,
+  .admin-request-count strong {
+    font-size:
+      42px !important;
+  }
+
+
+  /* ================= DASHBOARD STATS ================= */
+
+  .admin-stats {
+    grid-template-columns:
+      1fr
+      1fr !important;
+  }
+
+
+  .admin-stat-card {
+    min-height:
+      145px !important;
+
+    padding:
+      18px !important;
+  }
+
+
+  .admin-stat-card strong {
+    font-size:
+      43px !important;
+  }
+
+
+  .admin-stat-top span {
+    font-size:
+      8px !important;
+  }
+
+
+  /* ================= LOWER CARDS ================= */
+
+  .admin-recent-projects,
+  .admin-activity {
+    padding:
+      21px !important;
+  }
+
+
+  .admin-section-head h3 {
+    font-size:
+      20px !important;
+  }
+
+
+  /* ================= CLIENT TABLE -> CARDS ================= */
+
+  .admin-clients-table-head {
+    display: none !important;
+  }
+
+
+  .admin-client-row {
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      15px !important;
+
+    min-height:
+      auto !important;
+
+    padding:
+      21px
+      14px !important;
+  }
+
+
+  .admin-client-row > div {
+    display: flex !important;
+  }
+
+
+  .admin-client-menu {
+    display: flex !important;
+
+    justify-content:
+      flex-start !important;
+  }
+
+
+  /* ================= PROJECT TABLE -> CARDS ================= */
+
+  .admin-project-table-head {
+    display: none !important;
+  }
+
+
+  .admin-project-row {
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      15px !important;
+
+    min-height:
+      auto !important;
+
+    padding:
+      21px
+      14px !important;
+  }
+
+
+  .admin-project-row > div {
+    display: flex !important;
+  }
+
+
+  .admin-project-progress {
+    display: block !important;
+  }
+
+
+  .admin-project-menu {
+    justify-content:
+      flex-start !important;
+  }
+
+
+  /* ================= REQUEST TABLE -> CARDS ================= */
+
+  .admin-request-table-head {
+    display: none !important;
+  }
+
+
+  .admin-request-row {
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      15px !important;
+
+    min-height:
+      auto !important;
+
+    padding:
+      21px
+      14px !important;
+  }
+
+
+  .admin-request-row > div {
+    display: flex !important;
+  }
+
+
+  .admin-request-row-actions {
+    justify-content:
+      flex-start !important;
+  }
+
+
+  /* ================= SEARCH/FILTER ================= */
+
+  .admin-project-action-right {
+    flex-direction:
+      column !important;
+  }
+
+
+  .admin-client-search,
+  .admin-project-search,
+  .admin-request-search,
+  .admin-project-filter,
+  .admin-request-filter,
+  .admin-create-project-btn,
+  .admin-add-client {
+    min-height:
+      46px !important;
+  }
+
+
+  /* ================= MODULE CARDS ================= */
+
+  .admin-module-card {
+    padding:
+      18px !important;
+  }
+
+
+  .admin-module-card-head {
+    flex-direction:
+      column !important;
+
+    align-items:
+      flex-start !important;
+
+    gap:
+      12px !important;
+  }
+
+
+  .admin-module-meta {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .admin-module-card-footer {
+    flex-direction:
+      column !important;
+
+    align-items:
+      flex-start !important;
+
+    gap:
+      14px !important;
+  }
+
+
+  /* ================= PROJECT MODULE DRAWER ================= */
+
+  .admin-module-drawer {
+    width:
+      100% !important;
+
+    padding:
+      20px
+      16px !important;
+  }
+
+
+  .admin-module-drawer-head h2 {
+    font-size:
+      24px !important;
+  }
+
+
+  .admin-module-summary {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .admin-module-summary > div + div {
+    border-left:
+      0 !important;
+
+    border-top:
+      1px solid
+      rgba(25,25,22,.22) !important;
+  }
+
+
+  .admin-module-form {
+    padding:
+      17px !important;
+  }
+
+
+  .admin-module-form-row {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .admin-module-form-actions {
+    flex-direction:
+      column !important;
+  }
+
+
+  .admin-module-form-actions button {
+    width:
+      100% !important;
+  }
+
+
+  /* ================= REQUEST DRAWER ================= */
+
+  .admin-request-drawer {
+    width:
+      100% !important;
+
+    padding:
+      22px
+      17px !important;
+  }
+
+
+  .admin-request-detail-grid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .admin-request-drawer-actions {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  /* ================= CREATE PROJECT DRAWER ================= */
+
+  .admin-project-modal {
+    width:
+      100% !important;
+
+    padding:
+      22px
+      17px !important;
+  }
+
+
+  .admin-project-modal-head h2 {
+    font-size:
+      29px !important;
+  }
+
+
+  .admin-project-form-row {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .admin-project-form-actions {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  /* ================= DEVELOPER MODAL ================= */
+
+  .admin-developer-modal-backdrop {
+    padding:
+      10px !important;
+  }
+
+
+  .admin-developer-modal {
+    max-height:
+      calc(100vh - 20px) !important;
+
+    overflow-y:
+      auto !important;
+  }
+
+
+  .admin-developer-modal-head,
+  .admin-developer-form {
+    padding:
+      18px !important;
+  }
+
+
+  .admin-developer-modal-head h2 {
+    font-size:
+      23px !important;
+  }
+
+
+  .admin-developer-form-actions {
+    flex-direction:
+      column-reverse !important;
+  }
+
+
+  .admin-developer-form-actions button {
+    width:
+      100% !important;
+  }
+
+
+  /* ================= REVIEW CARDS ================= */
+
+  .admin-module-list {
+    width:
+      100% !important;
+  }
+
+
+  /* ================= MODAL HEADS ================= */
+
+  .admin-module-drawer-head,
+  .admin-project-modal-head,
+  .admin-request-drawer-head,
+  .admin-developer-modal-head {
+    gap:
+      13px !important;
+  }
+
+}
+
+
+
+/* =========================================================
+   VERY SMALL MOBILE — 380px
+========================================================= */
+
+@media (max-width: 380px) {
+
+  .admin-main {
+    padding-left:
+      13px !important;
+
+    padding-right:
+      13px !important;
+  }
+
+
+  /* dashboard cards single column */
+
+  .admin-stats {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .admin-stat-card {
+    min-height:
+      125px !important;
+
+    border-right:
+      0 !important;
+
+    border-bottom:
+      1px solid
+      rgba(25,26,22,.25) !important;
+  }
+
+
+  .admin-stat-card:last-child {
+    border-bottom:
+      0 !important;
+  }
+
+
+  .admin-nav-item {
+    padding:
+      0
+      10px !important;
+  }
+
+
+  .admin-welcome h2,
+  .admin-clients-intro h2,
+  .admin-projects-intro h2,
+  .admin-requests-intro h2 {
+    font-size:
+      38px !important;
+  }
+
+
+  .admin-module-drawer,
+  .admin-project-modal,
+  .admin-request-drawer {
+    padding:
+      18px
+      14px !important;
+  }
+
+}
+/* =========================================================
+   FALDREN DEVELOPER PORTAL
+   DARKER CONTENT + PREMIUM MOTION
+========================================================= */
+
+
+/* =========================================================
+   1. GENERAL TEXT CONTRAST
+========================================================= */
+
+.developer-portal {
+  color: #171812 !important;
+}
+
+
+/* FALDREN / DEVELOPER */
+
+.developer-portal .admin-page-label {
+  color: #50523e !important;
+  opacity: 1 !important;
+}
+
+
+/* ASSIGNED WORK */
+
+.developer-portal .admin-clients-kicker {
+  color: #4f5140 !important;
+  opacity: 1 !important;
+}
+
+
+/* Manage assigned work... */
+
+.developer-portal .admin-clients-intro p {
+  color: #4c4942 !important;
+  opacity: 1 !important;
+}
+
+
+/* Developer name secondary label */
+
+.developer-portal .admin-profile-copy span {
+  color: #555149 !important;
+  opacity: 1 !important;
+}
+
+
+/* =========================================================
+   2. SEARCH + FILTER
+========================================================= */
+
+.developer-portal .admin-project-search {
+  border-color:
+    rgba(23, 24, 18, .34) !important;
+
+  color: #33342d !important;
+}
+
+
+.developer-portal .admin-project-search svg {
+  color: #45463c !important;
+  opacity: 1 !important;
+}
+
+
+.developer-portal .admin-project-search input {
+  color: #171812 !important;
+  opacity: 1 !important;
+}
+
+
+.developer-portal
+.admin-project-search
+input::placeholder {
+  color: #514e47 !important;
+  opacity: 1 !important;
+}
+
+
+.developer-portal .admin-project-filter {
+  color: #292a24 !important;
+
+  border-color:
+    rgba(23, 24, 18, .34) !important;
+
+  opacity: 1 !important;
+}
+
+
+/* =========================================================
+   3. MODULE CARD
+========================================================= */
+
+.developer-portal .admin-module-card {
+  position: relative;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(23, 24, 18, .34) !important;
+
+  color: #171812 !important;
+
+  transition:
+    transform .38s cubic-bezier(.16, 1, .3, 1),
+    border-color .38s ease,
+    box-shadow .38s ease,
+    background-color .38s ease !important;
+}
+
+
+/* ice cream shop website / MODULE 002 */
+
+.developer-portal
+.admin-module-card-head
+> div
+> span {
+  color: #444139 !important;
+  opacity: 1 !important;
+}
+
+
+/* animation / authentication */
+
+.developer-portal
+.admin-module-card-head
+h3 {
+  color: #171812 !important;
+  opacity: 1 !important;
+}
+
+
+/* fully animative ui */
+
+.developer-portal
+.admin-module-description {
+  color: #403e38 !important;
+  opacity: 1 !important;
+}
+
+
+/* =========================================================
+   4. META — BRANCH / DATE / PROJECT
+========================================================= */
+
+.developer-portal .admin-module-meta {
+  border-top-color:
+    rgba(23, 24, 18, .24) !important;
+
+  border-bottom-color:
+    rgba(23, 24, 18, .24) !important;
+}
+
+
+.developer-portal
+.admin-module-meta
+> div {
+  color: #3f3d36 !important;
+  opacity: 1 !important;
+}
+
+
+.developer-portal
+.admin-module-meta
+span {
+  color: #3f3d36 !important;
+  opacity: 1 !important;
+}
+
+
+.developer-portal
+.admin-module-meta
+svg {
+  color: #484a3a !important;
+  opacity: 1 !important;
+}
+
+
+/* =========================================================
+   5. ACCEPTANCE CRITERIA
+========================================================= */
+
+/* works even if acceptance block class differs slightly */
+
+.developer-portal
+[class*="acceptance"] {
+  color: #3f3d36 !important;
+  opacity: 1 !important;
+}
+
+
+.developer-portal
+[class*="acceptance"]
+span {
+  color: #504d46 !important;
+  opacity: 1 !important;
+}
+
+
+.developer-portal
+[class*="acceptance"]
+p {
+  color: #3f3d36 !important;
+  opacity: 1 !important;
+}
+
+
+/* Generic card text except status/priority */
+
+.developer-portal
+.admin-module-card
+span:not(.admin-module-status):not(.admin-module-priority) {
+  opacity: 1 !important;
+}
+
+
+/* =========================================================
+   6. FOOTER — PRIORITY / BASE / LINKS
+========================================================= */
+
+.developer-portal
+.admin-module-card-footer {
+  color: #403e38 !important;
+  opacity: 1 !important;
+}
+
+
+.developer-portal
+.admin-module-card-footer
+span {
+  opacity: 1 !important;
+}
+
+
+.developer-portal
+.admin-module-priority {
+  opacity: 1 !important;
+
+  border-color:
+    rgba(23, 24, 18, .30) !important;
+}
+
+
+.developer-portal
+.admin-module-card-footer
+a {
+  color: #3d3f31 !important;
+  opacity: 1 !important;
+
+  text-decoration: none;
+
+  transition:
+    transform .25s cubic-bezier(.16, 1, .3, 1),
+    color .25s ease;
+}
+
+
+.developer-portal
+.admin-module-card-footer
+a:hover {
+  color: #171812 !important;
+
+  transform:
+    translateY(-2px);
+}
+
+
+/* =========================================================
+   7. STATUS — KEEP SEMANTIC COLOURS BUT STRONGER
+========================================================= */
+
+.developer-portal .admin-module-status {
+  opacity: 1 !important;
+
+  font-weight: 600 !important;
+
+  background:
+    rgba(255, 255, 255, .10);
+}
+
+
+.developer-portal
+.admin-module-status.approved,
+.developer-portal
+.admin-module-status.completed {
+  color: #31583e !important;
+
+  border-color:
+    rgba(49, 88, 62, .48) !important;
+}
+
+
+.developer-portal
+.admin-module-status.in-progress {
+  color: #344d75 !important;
+}
+
+
+.developer-portal
+.admin-module-status.in-review {
+  color: #675027 !important;
+}
+
+
+.developer-portal
+.admin-module-status.changes-requested {
+  color: #783f35 !important;
+}
+
+
+/* =========================================================
+   8. EMPTY STATE
+========================================================= */
+
+.developer-portal .admin-module-empty {
+  color: #45423b !important;
+  opacity: 1 !important;
+}
+
+
+.developer-portal
+.admin-module-empty
+span {
+  color: #555149 !important;
+  opacity: 1 !important;
+}
+
+
+/* =========================================================
+   9. PAGE HEADER ANIMATION
+========================================================= */
+
+@keyframes developerTitleReveal {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translateY(36px);
+
+    filter:
+      blur(7px);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+    filter:
+      blur(0);
+  }
+
+}
+
+
+.developer-portal
+.admin-topbar {
+  animation:
+    developerTitleReveal
+    .65s
+    cubic-bezier(.16, 1, .3, 1)
+    both !important;
+}
+
+
+.developer-portal
+.admin-clients-kicker {
+  animation:
+    developerTitleReveal
+    .6s
+    .08s
+    cubic-bezier(.16, 1, .3, 1)
+    both !important;
+}
+
+
+.developer-portal
+.admin-clients-intro
+h2 {
+  animation:
+    developerTitleReveal
+    .85s
+    .15s
+    cubic-bezier(.16, 1, .3, 1)
+    both !important;
+}
+
+
+.developer-portal
+.admin-clients-intro
+p {
+  animation:
+    developerTitleReveal
+    .75s
+    .27s
+    cubic-bezier(.16, 1, .3, 1)
+    both !important;
+}
+
+
+/* =========================================================
+   10. SEARCH BAR ENTRANCE
+========================================================= */
+
+@keyframes developerActionsReveal {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(24px)
+      scale(.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+.developer-portal
+.admin-project-actions {
+  animation:
+    developerActionsReveal
+    .7s
+    .36s
+    cubic-bezier(.16, 1, .3, 1)
+    both !important;
+}
+
+
+/* =========================================================
+   11. MASS CARD STAGGER
+========================================================= */
+
+@keyframes developerTaskReveal {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translateY(50px)
+      scale(.965);
+
+    filter:
+      blur(8px);
+  }
+
+  65% {
+    opacity: 1;
+
+    transform:
+      translateY(-5px)
+      scale(1.005);
+
+    filter:
+      blur(0);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+
+    filter:
+      blur(0);
+  }
+
+}
+
+
+.developer-portal
+.admin-module-list
+.admin-module-card {
+  opacity: 0;
+
+  animation:
+    developerTaskReveal
+    .82s
+    cubic-bezier(.16, 1, .3, 1)
+    forwards !important;
+}
+
+
+.developer-portal
+.admin-module-card:nth-child(1) {
+  animation-delay: .42s !important;
+}
+
+
+.developer-portal
+.admin-module-card:nth-child(2) {
+  animation-delay: .54s !important;
+}
+
+
+.developer-portal
+.admin-module-card:nth-child(3) {
+  animation-delay: .66s !important;
+}
+
+
+.developer-portal
+.admin-module-card:nth-child(4) {
+  animation-delay: .78s !important;
+}
+
+
+.developer-portal
+.admin-module-card:nth-child(5) {
+  animation-delay: .90s !important;
+}
+
+
+.developer-portal
+.admin-module-card:nth-child(n+6) {
+  animation-delay: 1s !important;
+}
+
+
+/* =========================================================
+   12. OLIVE LINE SWEEP
+========================================================= */
+
+.developer-portal
+.admin-module-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
+
+  background: #686a52;
+
+  transform:
+    scaleX(0);
+
+  transform-origin:
+    left center;
+
+  transition:
+    transform .55s
+    cubic-bezier(.16, 1, .3, 1);
+}
+
+
+.developer-portal
+.admin-module-card:hover::before {
+  transform:
+    scaleX(1);
+}
+
+
+/* =========================================================
+   13. PREMIUM CARD HOVER
+========================================================= */
+
+.developer-portal
+.admin-module-card:hover {
+  transform:
+    translateY(-7px)
+    scale(1.005) !important;
+
+  border-color:
+    rgba(23, 24, 18, .52) !important;
+
+  box-shadow:
+    0
+    22px
+    50px
+    rgba(23, 24, 18, .075);
+
+  background:
+    rgba(255, 255, 255, .12);
+}
+
+
+/* =========================================================
+   14. META ITEM MICRO MOTION
+========================================================= */
+
+.developer-portal
+.admin-module-meta
+> div {
+  transition:
+    transform .28s
+    cubic-bezier(.16, 1, .3, 1);
+}
+
+
+.developer-portal
+.admin-module-card:hover
+.admin-module-meta
+> div:nth-child(1) {
+  transform:
+    translateX(3px);
+}
+
+
+.developer-portal
+.admin-module-card:hover
+.admin-module-meta
+> div:nth-child(2) {
+  transform:
+    translateX(5px);
+}
+
+
+.developer-portal
+.admin-module-card:hover
+.admin-module-meta
+> div:nth-child(3) {
+  transform:
+    translateX(7px);
+}
+
+
+/* =========================================================
+   15. STATUS ENTER
+========================================================= */
+
+@keyframes developerStatusPop {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      scale(.75)
+      translateY(-5px);
+  }
+
+  70% {
+    opacity: 1;
+
+    transform:
+      scale(1.07)
+      translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      scale(1);
+  }
+
+}
+
+
+.developer-portal
+.admin-module-status {
+  animation:
+    developerStatusPop
+    .55s
+    .8s
+    cubic-bezier(.16, 1, .3, 1)
+    both;
+}
+
+
+/* =========================================================
+   16. SEARCH FOCUS
+========================================================= */
+
+.developer-portal
+.admin-project-search {
+  transition:
+    border-color .3s ease,
+    box-shadow .3s ease,
+    transform .3s
+    cubic-bezier(.16, 1, .3, 1);
+}
+
+
+.developer-portal
+.admin-project-search:focus-within {
+  border-color:
+    #686a52 !important;
+
+  box-shadow:
+    0 0 0 2px
+    rgba(104, 106, 82, .10);
+
+  transform:
+    translateY(-2px);
+}
+
+
+/* =========================================================
+   17. MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+  .developer-portal
+  .admin-clients-intro
+  h2 {
+    font-size:
+      clamp(
+        42px,
+        12vw,
+        56px
+      ) !important;
+  }
+
+
+  .developer-portal
+  .admin-project-actions {
+    gap: 12px !important;
+  }
+
+
+  .developer-portal
+  .admin-module-card {
+    padding:
+      18px
+      15px !important;
+  }
+
+
+  .developer-portal
+  .admin-module-card-head {
+    flex-direction:
+      column !important;
+
+    align-items:
+      flex-start !important;
+  }
+
+
+  .developer-portal
+  .admin-module-meta {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .developer-portal
+  .admin-module-card-footer {
+    flex-wrap:
+      wrap !important;
+
+    align-items:
+      flex-start !important;
+  }
+
+
+  /* no hover jumping on touch screen */
+
+  .developer-portal
+  .admin-module-card:hover {
+    transform:
+      none !important;
+
+    box-shadow:
+      none;
+  }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .developer-portal * {
+    animation:
+      none !important;
+
+    transition-duration:
+      .01ms !important;
+  }
+
+}
+/* =========================================================
+   DEVELOPER TASKS — SMALL TEXT SIZE TUNE
+   ONLY SLIGHTLY BIGGER
+========================================================= */
+
+
+/* feature/P1-authentication
+   12 Oct 2026
+   e-commerce site */
+
+.developer-portal
+.admin-module-meta
+> div {
+  font-size: 11px !important;
+}
+
+
+.developer-portal
+.admin-module-meta
+span {
+  font-size: 11px !important;
+}
+
+
+/* meta icons */
+
+.developer-portal
+.admin-module-meta
+svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+
+/* ACCEPTANCE CRITERIA label */
+
+.developer-portal
+[class*="acceptance"]
+span {
+  font-size: 10px !important;
+  letter-spacing: .12em !important;
+}
+
+
+/* acceptance criteria content */
+
+.developer-portal
+[class*="acceptance"]
+p {
+  font-size: 12px !important;
+  line-height: 1.6 !important;
+}
+
+
+/* MEDIUM / Base: develop / Repository / Pull Request */
+
+.developer-portal
+.admin-module-card-footer {
+  font-size: 10px !important;
+}
+
+
+.developer-portal
+.admin-module-priority {
+  font-size: 9px !important;
+}
+
+
+/* project / module small heading */
+
+.developer-portal
+.admin-module-card-head
+> div
+> span {
+  font-size: 10px !important;
+}
+/* =========================================================
+   DEVELOPER TASK CARD — READABILITY SIZE FIX
+========================================================= */
+
+.developer-portal .admin-module-card {
+  font-size: 12px !important;
+}
+
+
+/* ice cream shop website / MODULE 002 */
+
+.developer-portal
+.admin-module-card-head
+> div
+> span {
+  font-size: 11px !important;
+}
+
+
+/* animation / authentication */
+
+.developer-portal
+.admin-module-card-head
+h3 {
+  font-size: 18px !important;
+}
+
+
+/* description */
+
+.developer-portal
+.admin-module-description {
+  font-size: 18px !important;
+  line-height: 1.65 !important;
+}
+
+
+/* branch / date / project */
+
+.developer-portal
+.admin-module-meta
+> div,
+.developer-portal
+.admin-module-meta
+span {
+  font-size: 18px !important;
+}
+
+
+/* branch / calendar / project icons */
+
+.developer-portal
+.admin-module-meta
+svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+
+/* Catch small labels like ACCEPTANCE CRITERIA */
+
+.developer-portal
+.admin-module-card
+span:not(.admin-module-status):not(.admin-module-priority) {
+  font-size: 19px !important;
+}
+
+
+/* acceptance criteria content and normal paragraphs */
+
+.developer-portal
+.admin-module-card
+p {
+  font-size: 18px !important;
+}
+
+
+/* MEDIUM */
+
+.developer-portal
+.admin-module-priority {
+  font-size: 20px !important;
+  padding: 5px 8px !important;
+}
+
+
+/* Base: develop + footer */
+
+.developer-portal
+.admin-module-card-footer {
+  font-size: 20px !important;
+}
+
+
+/* Repository / Pull Request */
+
+.developer-portal
+.admin-module-card-footer
+a {
+  font-size: 19px !important;
+}
+
+
+/* APPROVED / IN REVIEW etc */
+
+.developer-portal
+.admin-module-status {
+  font-size: 12px !important;
+  padding: 7px 10px !important;
+}
+/* =========================================================
+   DEVELOPER TASKS — FINAL READABLE SIZE
+========================================================= */
+
+
+/* project / module label */
+
+.developer-portal
+.admin-module-card-head
+> div
+> span {
+  font-size: 12px !important;
+}
+
+
+/* authentication / animation */
+
+.developer-portal
+.admin-module-card-head
+h3 {
+  font-size: 20px !important;
+}
+
+
+/* description */
+
+.developer-portal
+.admin-module-description {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+
+/* branch / date / project */
+
+.developer-portal
+.admin-module-meta
+> div,
+.developer-portal
+.admin-module-meta
+span {
+  font-size: 13px !important;
+}
+
+
+/* icons */
+
+.developer-portal
+.admin-module-meta
+svg {
+  width: 17px !important;
+  height: 17px !important;
+}
+
+
+/* ACCEPTANCE CRITERIA */
+
+.developer-portal
+.admin-module-card
+[class*="acceptance"] span {
+  font-size: 12px !important;
+}
+
+
+/* acceptance criteria value */
+
+.developer-portal
+.admin-module-card
+[class*="acceptance"] p {
+  font-size: 14px !important;
+}
+
+
+/* fallback — acceptance label/general small labels */
+
+.developer-portal
+.admin-module-card
+span:not(.admin-module-status):not(.admin-module-priority) {
+  font-size: 12px !important;
+}
+
+
+/* MEDIUM */
+
+.developer-portal
+.admin-module-priority {
+  font-size: 11px !important;
+
+  padding:
+    6px
+    9px !important;
+}
+
+
+/* Base: develop */
+
+.developer-portal
+.admin-module-card-footer {
+  font-size: 12px !important;
+}
+
+
+/* Repository / Pull Request */
+
+.developer-portal
+.admin-module-card-footer a {
+  font-size: 12px !important;
+}
+
+
+/* APPROVED */
+
+.developer-portal
+.admin-module-status {
+  font-size: 10px !important;
+
+  padding:
+    7px
+    11px !important;
+}
+/* =========================================================
+   DEVELOPER DASHBOARD — STAT CARDS + READABILITY
+========================================================= */
+
+
+/* REMOVE OLD CONNECTED-LINE LOOK */
+
+.developer-portal .admin-stats {
+  gap: 16px !important;
+
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+}
+
+
+/* ACTUAL INDIVIDUAL CARDS */
+
+.developer-portal .admin-stat-card {
+  min-height: 165px !important;
+
+  padding: 24px !important;
+
+  border:
+    1px solid
+    rgba(21, 22, 17, .30) !important;
+
+  background:
+    rgba(255, 255, 255, .12) !important;
+
+  position: relative;
+
+  overflow: hidden;
+
+  transition:
+    transform .32s cubic-bezier(.16, 1, .3, 1),
+    border-color .32s ease,
+    box-shadow .32s ease !important;
+}
+
+
+/* remove old right-side divider */
+
+.developer-portal
+.admin-stat-card:last-child,
+.developer-portal
+.admin-stat-card:nth-child(2) {
+  border-right:
+    1px solid
+    rgba(21, 22, 17, .30) !important;
+}
+
+
+/* =========================================================
+   STAT SMALL TEXT — SLIGHTLY BIGGER
+========================================================= */
+
+/* ASSIGNED MODULES / IN PROGRESS / etc */
+
+.developer-portal .admin-stat-top {
+  color: #454239 !important;
+}
+
+
+.developer-portal
+.admin-stat-top
+span {
+  font-size: 12px !important;
+
+  font-weight: 600 !important;
+
+  letter-spacing: .10em !important;
+
+  color: #454239 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* ICON */
+
+.developer-portal
+.admin-stat-top
+svg {
+  width: 20px !important;
+  height: 20px !important;
+
+  color: #25261f !important;
+}
+
+
+/* 02 / 00 */
+
+.developer-portal
+.admin-stat-card
+strong {
+  font-size: 58px !important;
+
+  color: #171812 !important;
+}
+
+
+/* =========================================================
+   CARD HOVER
+========================================================= */
+
+.developer-portal
+.admin-stat-card:hover {
+  transform:
+    translateY(-6px);
+
+  border-color:
+    rgba(21, 22, 17, .48) !important;
+
+  box-shadow:
+    0 16px 38px
+    rgba(21, 22, 17, .06);
+}
+
+
+/* OLIVE TOP LINE */
+
+.developer-portal
+.admin-stat-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
+
+  background: #686a52;
+
+  transform: scaleX(0);
+
+  transform-origin: left;
+
+  transition:
+    transform .4s
+    cubic-bezier(.16, 1, .3, 1);
+}
+
+
+.developer-portal
+.admin-stat-card:hover::before {
+  transform: scaleX(1);
+}
+
+
+/* =========================================================
+   WELCOME AREA SMALL TEXT
+========================================================= */
+
+/* DEVELOPMENT WORKSPACE */
+
+.developer-portal
+.admin-welcome
+> div
+> span {
+  font-size: 11px !important;
+
+  font-weight: 600 !important;
+
+  color: #50523e !important;
+
+  opacity: 1 !important;
+}
+
+
+/* Track your current workload... */
+
+.developer-portal
+.admin-welcome
+p {
+  font-size: 16px !important;
+
+  color: #4d4942 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* =========================================================
+   LOWER "MY WORK" CARD
+========================================================= */
+
+.developer-portal
+.admin-recent-projects,
+.developer-portal
+.admin-activity {
+  border:
+    1px solid
+    rgba(21, 22, 17, .28) !important;
+}
+
+
+/* MY WORK */
+
+.developer-portal
+.admin-section-head
+span {
+  font-size: 10px !important;
+
+  font-weight: 600 !important;
+
+  color: #50523e !important;
+
+  opacity: 1 !important;
+}
+
+
+/* Manage your assigned tasks */
+
+.developer-portal
+.admin-section-head
+h3 {
+  font-size: 24px !important;
+}
+
+
+/* lower description */
+
+.developer-portal
+.admin-recent-projects
+p,
+.developer-portal
+.admin-activity
+p {
+  font-size: 14px !important;
+
+  color: #555149 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 650px) {
+
+  .developer-portal
+  .admin-stats {
+    grid-template-columns:
+      1fr 1fr !important;
+
+    gap: 10px !important;
+  }
+
+
+  .developer-portal
+  .admin-stat-card {
+    min-height: 145px !important;
+
+    padding: 18px !important;
+  }
+
+
+  .developer-portal
+  .admin-stat-card
+  strong {
+    font-size: 48px !important;
+  }
+
+
+  .developer-portal
+  .admin-stat-top
+  span {
+    font-size: 10px !important;
+  }
+
+}
+
+
+@media (max-width: 380px) {
+
+  .developer-portal
+  .admin-stats {
+    grid-template-columns:
+      1fr !important;
+  }
+
+}
+/* =========================================================
+   DEVELOPER DASHBOARD — STAT CARDS
+========================================================= */
+
+.developer-portal .developer-stats {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-top: 10px;
+}
+
+
+/* CARD */
+
+.developer-portal .developer-stat-card {
+  min-height: 165px;
+
+  padding: 24px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  border:
+    1px solid
+    rgba(21, 22, 17, .30);
+
+  background:
+    rgba(255, 255, 255, .10);
+
+  position: relative;
+
+  overflow: hidden;
+
+  opacity: 0;
+
+  animation:
+    developerStatReveal
+    .7s
+    cubic-bezier(.16, 1, .3, 1)
+    forwards;
+
+  transition:
+    transform .35s
+      cubic-bezier(.16, 1, .3, 1),
+    border-color .35s ease,
+    box-shadow .35s ease;
+}
+
+
+/* STAGGER */
+
+.developer-portal
+.developer-stat-card:nth-child(1) {
+  animation-delay: .12s;
+}
+
+.developer-portal
+.developer-stat-card:nth-child(2) {
+  animation-delay: .22s;
+}
+
+.developer-portal
+.developer-stat-card:nth-child(3) {
+  animation-delay: .32s;
+}
+
+.developer-portal
+.developer-stat-card:nth-child(4) {
+  animation-delay: .42s;
+}
+
+
+@keyframes developerStatReveal {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(30px)
+      scale(.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+/* HEADER */
+
+.developer-portal .developer-stat-head {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 14px;
+}
+
+
+/* ASSIGNED MODULES etc */
+
+.developer-portal
+.developer-stat-head
+span {
+  font-size: 12px;
+
+  font-weight: 600;
+
+  letter-spacing: .10em;
+
+  color: #454239;
+
+  opacity: 1;
+}
+
+
+/* ICON */
+
+.developer-portal
+.developer-stat-head
+svg {
+  width: 20px;
+
+  height: 20px;
+
+  color: #272820;
+}
+
+
+/* NUMBER */
+
+.developer-portal
+.developer-stat-card
+> strong {
+  font-family:
+    "Manrope",
+    sans-serif;
+
+  font-size: 56px;
+
+  line-height: 1;
+
+  font-weight: 500;
+
+  letter-spacing: -.06em;
+
+  color: #171812;
+}
+
+
+/* OLIVE TOP LINE */
+
+.developer-portal
+.developer-stat-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
+
+  background: #686a52;
+
+  transform: scaleX(0);
+
+  transform-origin: left;
+
+  transition:
+    transform .45s
+    cubic-bezier(.16, 1, .3, 1);
+}
+
+
+.developer-portal
+.developer-stat-card:hover::before {
+  transform: scaleX(1);
+}
+
+
+/* HOVER */
+
+.developer-portal
+.developer-stat-card:hover {
+  transform:
+    translateY(-6px);
+
+  border-color:
+    rgba(21, 22, 17, .48);
+
+  box-shadow:
+    0 18px 40px
+    rgba(21, 22, 17, .07);
+}
+
+
+/* TABLET */
+
+@media (max-width: 900px) {
+
+  .developer-portal
+  .developer-stats {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+}
+
+
+/* MOBILE */
+
+@media (max-width: 520px) {
+
+  .developer-portal
+  .developer-stats {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .developer-portal
+  .developer-stat-card {
+    min-height: 135px;
+
+    padding: 19px;
+  }
+
+
+  .developer-portal
+  .developer-stat-card
+  > strong {
+    font-size: 48px;
+  }
+
+}

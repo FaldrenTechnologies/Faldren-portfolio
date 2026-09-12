@@ -206,7 +206,7 @@ function DeveloperDashboard() {
 
   return (
 
-    <div className="admin-dashboard">
+    <div className="admin-dashboard developer-portal">
 
 
       {/* ======================================
@@ -317,124 +317,88 @@ function DeveloperDashboard() {
         )}
 
 
-        {/* ======================================
-            STATS
-        ====================================== */}
+       {/* ======================================
+    STATS
+====================================== */}
 
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(190px, 1fr))",
-            gap: "16px"
-          }}
-        >
+<section className="developer-stats">
 
+  <div className="developer-stat-card">
 
-          <div className="admin-client-count">
+    <div className="developer-stat-head">
+      <span>ASSIGNED MODULES</span>
 
-            <FolderKanban
-              size={20}
-            />
+      <FolderKanban size={20} />
+    </div>
 
-            <span>
-              ASSIGNED MODULES
-            </span>
+    <strong>
+      {loading
+        ? "--"
+        : String(
+            stats.assigned
+          ).padStart(2, "0")}
+    </strong>
 
-            <strong>
-
-              {loading
-                ? "--"
-                : String(
-                    stats.assigned
-                  ).padStart(
-                    2,
-                    "0"
-                  )}
-
-            </strong>
-
-          </div>
+  </div>
 
 
-          <div className="admin-client-count">
+  <div className="developer-stat-card">
 
-            <Clock3
-              size={20}
-            />
+    <div className="developer-stat-head">
+      <span>IN PROGRESS</span>
 
-            <span>
-              IN PROGRESS
-            </span>
+      <Clock3 size={20} />
+    </div>
 
-            <strong>
+    <strong>
+      {loading
+        ? "--"
+        : String(
+            stats.inProgress
+          ).padStart(2, "0")}
+    </strong>
 
-              {loading
-                ? "--"
-                : String(
-                    stats.inProgress
-                  ).padStart(
-                    2,
-                    "0"
-                  )}
-
-            </strong>
-
-          </div>
+  </div>
 
 
-          <div className="admin-client-count">
+  <div className="developer-stat-card">
 
-            <GitBranch
-              size={20}
-            />
+    <div className="developer-stat-head">
+      <span>IN REVIEW</span>
 
-            <span>
-              IN REVIEW
-            </span>
+      <GitBranch size={20} />
+    </div>
 
-            <strong>
+    <strong>
+      {loading
+        ? "--"
+        : String(
+            stats.inReview
+          ).padStart(2, "0")}
+    </strong>
 
-              {loading
-                ? "--"
-                : String(
-                    stats.inReview
-                  ).padStart(
-                    2,
-                    "0"
-                  )}
-
-            </strong>
-
-          </div>
+  </div>
 
 
-          <div className="admin-client-count">
+  <div className="developer-stat-card">
 
-            <ClipboardCheck
-              size={20}
-            />
+    <div className="developer-stat-head">
+      <span>COMPLETED</span>
 
-            <span>
-              COMPLETED
-            </span>
+      <ClipboardCheck size={20} />
+    </div>
 
-            <strong>
+    <strong>
+      {loading
+        ? "--"
+        : String(
+            stats.completed
+          ).padStart(2, "0")}
+    </strong>
 
-              {loading
-                ? "--"
-                : String(
-                    stats.completed
-                  ).padStart(
-                    2,
-                    "0"
-                  )}
+  </div>
 
-            </strong>
-
-          </div>
-
-        </section>
+</section>
 
 
         {/* ======================================
