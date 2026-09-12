@@ -3,6 +3,8 @@ package com.faldren.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -73,6 +75,11 @@ public class User {
     private LocalDateTime createdAt;
 
 
+@OneToMany(
+        mappedBy = "client"
+)
+private List<Conversation> conversations =
+        new ArrayList<>();
 
     // ==========================================
     // CONSTRUCTOR
@@ -222,4 +229,16 @@ public class User {
         this.createdAt =
                 createdAt;
     }
+ 
+
+public List<Conversation> getConversations() {
+    return conversations;
+}
+
+public void setConversations(
+        List<Conversation> conversations
+) {
+    this.conversations = conversations;
+}
+
 }

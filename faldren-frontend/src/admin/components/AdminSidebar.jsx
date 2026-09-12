@@ -8,7 +8,8 @@ import {
   Inbox,
   Settings,
   GitPullRequest,
-  LogOut
+  LogOut,
+  MessageSquare
 } from "lucide-react";
 
 import {
@@ -19,54 +20,60 @@ import {
 
 function AdminSidebar() {
 
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const location = useLocation();
-
-
-  const isActive = (path) => {
-
-    return (
-      location.pathname === path ||
-      location.pathname.startsWith(
-        `${path}/`
-      )
-    );
-
-  };
+  const location =
+    useLocation();
 
 
-  const handleLogout = () => {
+  const isActive =
+    path => {
 
-    localStorage.removeItem(
-      "adminToken"
-    );
+      return (
+        location.pathname ===
+          path ||
+        location.pathname
+          .startsWith(
+            `${path}/`
+          )
+      );
 
-    localStorage.removeItem(
-      "adminName"
-    );
-
-    localStorage.removeItem(
-      "adminEmail"
-    );
-
-    localStorage.removeItem(
-      "adminRole"
-    );
-
-    localStorage.removeItem(
-      "adminLoggedIn"
-    );
+    };
 
 
-    navigate(
-      "/admin/login",
-      {
-        replace: true
-      }
-    );
+  const handleLogout =
+    () => {
 
-  };
+      localStorage.removeItem(
+        "adminToken"
+      );
+
+      localStorage.removeItem(
+        "adminName"
+      );
+
+      localStorage.removeItem(
+        "adminEmail"
+      );
+
+      localStorage.removeItem(
+        "adminRole"
+      );
+
+      localStorage.removeItem(
+        "adminLoggedIn"
+      );
+
+
+      navigate(
+        "/admin/login",
+        {
+          replace: true
+        }
+      );
+
+    };
 
 
   return (
@@ -90,8 +97,6 @@ function AdminSidebar() {
 
       <nav className="admin-sidebar-nav">
 
-
-        {/* OVERVIEW */}
 
         <button
           type="button"
@@ -123,8 +128,6 @@ function AdminSidebar() {
 
 
 
-        {/* CLIENTS */}
-
         <button
           type="button"
           className={
@@ -143,9 +146,7 @@ function AdminSidebar() {
           }
         >
 
-          <Users
-            size={18}
-          />
+          <Users size={18} />
 
           <span>
             Clients
@@ -154,8 +155,6 @@ function AdminSidebar() {
         </button>
 
 
-
-        {/* DEVELOPERS */}
 
         <button
           type="button"
@@ -175,9 +174,7 @@ function AdminSidebar() {
           }
         >
 
-          <UserCog
-            size={18}
-          />
+          <UserCog size={18} />
 
           <span>
             Developers
@@ -186,8 +183,6 @@ function AdminSidebar() {
         </button>
 
 
-
-        {/* PROJECTS */}
 
         <button
           type="button"
@@ -219,8 +214,6 @@ function AdminSidebar() {
 
 
 
-        {/* REVIEWS */}
-
         <button
           type="button"
           className={
@@ -251,8 +244,6 @@ function AdminSidebar() {
 
 
 
-        {/* REQUESTS */}
-
         <button
           type="button"
           className={
@@ -271,12 +262,42 @@ function AdminSidebar() {
           }
         >
 
-          <Inbox
+          <Inbox size={18} />
+
+          <span>
+            Requests
+          </span>
+
+        </button>
+
+
+
+        {/* MESSAGES */}
+
+        <button
+          type="button"
+          className={
+            `admin-nav-item ${
+              isActive(
+                "/admin/messages"
+              )
+                ? "active"
+                : ""
+            }`
+          }
+          onClick={() =>
+            navigate(
+              "/admin/messages"
+            )
+          }
+        >
+
+          <MessageSquare
             size={18}
           />
 
           <span>
-            Requests
+            Messages
           </span>
 
         </button>
@@ -306,12 +327,12 @@ function AdminSidebar() {
         <button
           type="button"
           className="admin-nav-item"
-          onClick={handleLogout}
+          onClick={
+            handleLogout
+          }
         >
 
-          <LogOut
-            size={18}
-          />
+          <LogOut size={18} />
 
           <span>
             Logout
@@ -326,5 +347,6 @@ function AdminSidebar() {
   );
 
 }
+
 
 export default AdminSidebar;

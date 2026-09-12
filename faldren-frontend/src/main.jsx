@@ -17,7 +17,7 @@ import {
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-
+import AdminMessages from "./admin/pages/AdminMessages";
 import {
   BrowserRouter,
   Routes,
@@ -3252,7 +3252,14 @@ ReactDOM
     </ProtectedAdminRoute>
   }
 />
-
+<Route
+  path="/admin/messages"
+  element={
+    <ProtectedAdminRoute>
+      <AdminMessages />
+    </ProtectedAdminRoute>
+  }
+/>
         <Route
   path="/admin/projects"
   element={

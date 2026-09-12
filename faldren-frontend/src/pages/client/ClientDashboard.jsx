@@ -1,5 +1,6 @@
 import React, {
   useEffect,
+  useRef,
   useState
 } from "react";
 
@@ -55,6 +56,29 @@ function ClientDashboard({
     useState("");
 
 
+  // ==========================================
+  // MESSAGES
+  // ==========================================
+
+  const [messages, setMessages] =
+    useState([]);
+
+  const [loadingMessages, setLoadingMessages] =
+    useState(false);
+
+  const [messageText, setMessageText] =
+    useState("");
+
+  const [sendingMessage, setSendingMessage] =
+    useState(false);
+
+  const [messageError, setMessageError] =
+    useState("");
+
+  const messageEndRef =
+    useRef(null);
+
+
   const clientName =
     localStorage.getItem(
       "clientName"
@@ -107,6 +131,7 @@ function ClientDashboard({
         onLogout?.();
 
         return;
+
       }
 
 
@@ -154,6 +179,7 @@ function ClientDashboard({
           onLogout?.();
 
           return;
+
         }
 
 
@@ -275,6 +301,7 @@ function ClientDashboard({
         onLogout?.();
 
         return;
+
       }
 
 
@@ -317,6 +344,7 @@ function ClientDashboard({
           onLogout?.();
 
           return;
+
         }
 
 
@@ -328,6 +356,7 @@ function ClientDashboard({
           );
 
           return;
+
         }
 
 
@@ -372,6 +401,346 @@ function ClientDashboard({
 
 
 
+  // ==========================================
+  // LOAD CLIENT SUPPORT MESSAGES
+  // ==========================================
+
+  const loadMessages =
+    async (silent = false) => {
+
+      const token =
+        localStorage.getItem(
+          "clientToken"
+        );
+
+
+      if (!token) {
+
+        onLogout?.();
+
+        return;
+
+      }
+
+
+      if (!silent) {
+
+        setLoadingMessages(true);
+
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            `${API_BASE}/api/client/messages`,
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+
+          onLogout?.();
+
+          return;
+
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          if (!silent) {
+
+            setMessageError(
+              data.message ||
+              "Unable to load messages."
+            );
+
+          }
+
+          return;
+
+        }
+
+
+        setMessages(
+          Array.isArray(data)
+            ? data
+            : []
+        );
+
+
+        setMessageError("");
+
+
+      } catch (error) {
+
+        console.error(
+          "Message loading error:",
+          error
+        );
+
+
+        if (!silent) {
+
+          setMessageError(
+            "Unable to connect to the server."
+          );
+
+        }
+
+
+      } finally {
+
+        if (!silent) {
+
+          setLoadingMessages(false);
+
+        }
+
+      }
+
+    };
+
+
+
+  // ==========================================
+  // SEND CLIENT MESSAGE
+  // ==========================================
+
+  const handleSendMessage =
+    async (event) => {
+
+      event.preventDefault();
+
+
+      const cleanedMessage =
+        messageText.trim();
+
+
+      if (!cleanedMessage) {
+
+        return;
+
+      }
+
+
+      const token =
+        localStorage.getItem(
+          "clientToken"
+        );
+
+
+      if (!token) {
+
+        onLogout?.();
+
+        return;
+
+      }
+
+
+      setSendingMessage(true);
+
+      setMessageError("");
+
+
+      try {
+
+        const response =
+          await fetch(
+            `${API_BASE}/api/client/messages`,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+
+                Authorization:
+                  `Bearer ${token}`
+              },
+
+              body:
+                JSON.stringify({
+                  message:
+                    cleanedMessage
+                })
+            }
+          );
+
+
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+
+          onLogout?.();
+
+          return;
+
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          setMessageError(
+            data.message ||
+            "Unable to send message."
+          );
+
+          return;
+
+        }
+
+
+        setMessages(
+          current => [
+            ...current,
+            data
+          ]
+        );
+
+
+        setMessageText("");
+
+
+      } catch (error) {
+
+        console.error(
+          "Message sending error:",
+          error
+        );
+
+
+        setMessageError(
+          "Unable to connect to the server."
+        );
+
+
+      } finally {
+
+        setSendingMessage(false);
+
+      }
+
+    };
+
+
+
+  // ==========================================
+  // MESSAGE POLLING
+  // ==========================================
+
+  useEffect(() => {
+
+    if (
+      activeTab !==
+      "Messages"
+    ) {
+
+      return;
+
+    }
+
+
+    loadMessages();
+
+
+    const interval =
+      window.setInterval(
+        () => {
+
+          loadMessages(true);
+
+        },
+        3000
+      );
+
+
+    return () => {
+
+      window.clearInterval(
+        interval
+      );
+
+    };
+
+  }, [activeTab]);
+
+
+
+  // ==========================================
+  // AUTO SCROLL MESSAGE AREA
+  // ==========================================
+
+  useEffect(() => {
+
+    if (
+      activeTab !==
+      "Messages"
+    ) {
+
+      return;
+
+    }
+
+
+    messageEndRef.current
+      ?.scrollIntoView({
+        behavior: "smooth"
+      });
+
+  }, [
+    messages,
+    activeTab
+  ]);
+
+
+
+  const formatMessageTime =
+    (dateTime) => {
+
+      if (!dateTime) {
+
+        return "";
+
+      }
+
+
+      return new Date(
+        dateTime
+      ).toLocaleString(
+        "en-IN",
+        {
+          day: "2-digit",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit"
+        }
+      );
+
+    };
+
+
+
   const formatStatus =
     (status) => {
 
@@ -383,6 +752,7 @@ function ClientDashboard({
           "_",
           " "
         );
+
     };
 
 
@@ -1509,7 +1879,7 @@ function ClientDashboard({
             <div className="panel-heading">
 
               <p>
-                COMMUNICATION
+                PRIVATE SUPPORT
               </p>
 
               <h2>
@@ -1519,10 +1889,416 @@ function ClientDashboard({
             </div>
 
 
-            <p>
-              Project conversations will
-              appear here.
-            </p>
+            <div
+              style={{
+                minHeight: "560px",
+                display: "flex",
+                flexDirection: "column",
+                border:
+                  "1px solid rgba(25, 24, 22, 0.18)",
+                background:
+                  "rgba(255,255,255,0.12)"
+              }}
+            >
+
+              {/* CHAT HEADER */}
+
+              <div
+                style={{
+                  minHeight: "78px",
+                  padding: "16px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  borderBottom:
+                    "1px solid rgba(25, 24, 22, 0.14)"
+                }}
+              >
+
+                <div
+                  style={{
+                    width: "42px",
+                    height: "42px",
+                    borderRadius: "50%",
+                    display: "grid",
+                    placeItems: "center",
+                    flexShrink: 0,
+                    background: "#171812",
+                    color: "#eee9df",
+                    fontSize: "14px",
+                    fontWeight: 600
+                  }}
+                >
+                  F
+                </div>
+
+
+                <div>
+
+                  <strong
+                    style={{
+                      display: "block",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      color: "#171812"
+                    }}
+                  >
+                    FALDREN Support
+                  </strong>
+
+                  <span
+                    style={{
+                      display: "block",
+                      marginTop: "4px",
+                      fontSize: "10px",
+                      letterSpacing: "0.04em",
+                      color: "#5a564e"
+                    }}
+                  >
+                    Client ↔ Admin private conversation
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              {/* CHAT MESSAGES */}
+
+              <div
+                style={{
+                  height: "390px",
+                  overflowY: "auto",
+                  padding: "25px 22px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "14px",
+                  scrollBehavior: "smooth"
+                }}
+              >
+
+                {loadingMessages ? (
+
+                  <div
+                    style={{
+                      margin: "auto",
+                      fontSize: "12px",
+                      color: "#555149"
+                    }}
+                  >
+                    Loading conversation...
+                  </div>
+
+                ) : messages.length === 0 ? (
+
+                  <div
+                    style={{
+                      margin: "auto",
+                      maxWidth: "390px",
+                      padding: "40px 20px",
+                      textAlign: "center"
+                    }}
+                  >
+
+                    <span
+                      style={{
+                        display: "block",
+                        marginBottom: "12px",
+                        fontSize: "9px",
+                        letterSpacing: "0.18em",
+                        color: "#555149"
+                      }}
+                    >
+                      START A CONVERSATION
+                    </span>
+
+                    <h3
+                      style={{
+                        margin: "0 0 12px",
+                        fontSize: "28px",
+                        fontWeight: 400,
+                        letterSpacing: "-0.04em"
+                      }}
+                    >
+                      How can we help?
+                    </h3>
+
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "13px",
+                        lineHeight: 1.65,
+                        color: "#59554e"
+                      }}
+                    >
+                      Send a message to the FALDREN
+                      team about your project,
+                      requirements or account.
+                    </p>
+
+                  </div>
+
+                ) : (
+
+                  messages.map(
+                    message => {
+
+                      const ownMessage =
+                        message.senderRole ===
+                        "CLIENT";
+
+
+                      return (
+
+                        <div
+                          key={message.id}
+                          style={{
+                            width: "100%",
+                            display: "flex",
+                            justifyContent:
+                              ownMessage
+                                ? "flex-end"
+                                : "flex-start"
+                          }}
+                        >
+
+                          <div
+                            style={{
+                              width: "fit-content",
+                              maxWidth: "72%",
+                              padding: "13px 15px",
+                              border:
+                                ownMessage
+                                  ? "1px solid #171812"
+                                  : "1px solid rgba(25,24,22,0.15)",
+                              background:
+                                ownMessage
+                                  ? "#171812"
+                                  : "rgba(255,255,255,0.22)",
+                              color:
+                                ownMessage
+                                  ? "#f1ece2"
+                                  : "#393630"
+                            }}
+                          >
+
+                            <div
+                              style={{
+                                marginBottom: "7px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent:
+                                  "space-between",
+                                gap: "18px"
+                              }}
+                            >
+
+                              <strong
+                                style={{
+                                  fontSize: "9px",
+                                  letterSpacing: "0.12em",
+                                  textTransform:
+                                    "uppercase",
+                                  fontWeight: 600
+                                }}
+                              >
+                                {ownMessage
+                                  ? "You"
+                                  : "FALDREN"}
+                              </strong>
+
+                              <span
+                                style={{
+                                  fontSize: "9px",
+                                  color:
+                                    ownMessage
+                                      ? "rgba(241,236,226,0.6)"
+                                      : "#67635c"
+                                }}
+                              >
+                                {formatMessageTime(
+                                  message.createdAt
+                                )}
+                              </span>
+
+                            </div>
+
+
+                            <p
+                              style={{
+                                margin: 0,
+                                whiteSpace: "pre-wrap",
+                                wordBreak: "break-word",
+                                fontSize: "13px",
+                                lineHeight: 1.55,
+                                color:
+                                  ownMessage
+                                    ? "#f1ece2"
+                                    : "#393630"
+                              }}
+                            >
+                              {message.message}
+                            </p>
+
+                          </div>
+
+                        </div>
+
+                      );
+
+                    }
+                  )
+
+                )}
+
+
+                <div
+                  ref={messageEndRef}
+                />
+
+              </div>
+
+
+              {/* ERROR */}
+
+              {messageError && (
+
+                <div
+                  style={{
+                    margin:
+                      "0 20px 12px",
+                    padding: "10px 12px",
+                    border:
+                      "1px solid rgba(138,46,46,0.28)",
+                    background:
+                      "rgba(138,46,46,0.06)",
+                    color: "#7d2929",
+                    fontSize: "11px"
+                  }}
+                >
+                  {messageError}
+                </div>
+
+              )}
+
+
+              {/* MESSAGE INPUT */}
+
+              <form
+                onSubmit={
+                  handleSendMessage
+                }
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    "1fr auto",
+                  gap: "10px",
+                  padding: "15px 18px",
+                  borderTop:
+                    "1px solid rgba(25,24,22,0.14)"
+                }}
+              >
+
+                <textarea
+                  value={messageText}
+                  onChange={event =>
+                    setMessageText(
+                      event.target.value
+                    )
+                  }
+                  placeholder="Write a message..."
+                  rows="1"
+                  maxLength="5000"
+                  disabled={
+                    sendingMessage
+                  }
+                  onKeyDown={event => {
+
+                    if (
+                      event.key ===
+                        "Enter" &&
+                      !event.shiftKey
+                    ) {
+
+                      event.preventDefault();
+
+                      event.currentTarget
+                        .form
+                        ?.requestSubmit();
+
+                    }
+
+                  }}
+                  style={{
+                    minHeight: "48px",
+                    maxHeight: "130px",
+                    resize: "vertical",
+                    boxSizing:
+                      "border-box",
+                    padding: "14px 15px",
+                    border:
+                      "1px solid rgba(25,24,22,0.18)",
+                    outline: "none",
+                    background:
+                      "rgba(255,255,255,0.22)",
+                    color: "#171812",
+                    font: "inherit",
+                    fontSize: "13px",
+                    lineHeight: 1.45
+                  }}
+                />
+
+
+                <button
+                  type="submit"
+                  disabled={
+                    sendingMessage ||
+                    !messageText.trim()
+                  }
+                  style={{
+                    minWidth: "104px",
+                    padding: "0 18px",
+                    border:
+                      "1px solid #171812",
+                    background:
+                      sendingMessage ||
+                      !messageText.trim()
+                        ? "rgba(23,24,18,0.45)"
+                        : "#171812",
+                    color: "#eee9df",
+                    font: "inherit",
+                    fontSize: "11px",
+                    cursor:
+                      sendingMessage ||
+                      !messageText.trim()
+                        ? "not-allowed"
+                        : "pointer"
+                  }}
+                >
+
+                  {sendingMessage
+                    ? "Sending..."
+                    : "Send ↗"}
+
+                </button>
+
+              </form>
+
+
+              <div
+                style={{
+                  padding:
+                    "0 18px 15px",
+                  fontSize: "9px",
+                  color: "#6b675f",
+                  letterSpacing:
+                    "0.04em"
+                }}
+              >
+                Messages refresh automatically every 3 seconds.
+              </div>
+
+            </div>
 
           </section>
 
@@ -1654,6 +2430,7 @@ function ClientDashboard({
     </main>
 
   );
+
 }
 
 
