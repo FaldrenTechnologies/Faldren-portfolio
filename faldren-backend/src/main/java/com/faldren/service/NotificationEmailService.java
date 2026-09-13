@@ -1,26 +1,22 @@
 package com.faldren.service;
 
-import jakarta.mail.internet.MimeMessage;
-
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-
 import org.springframework.stereotype.Service;
 
 
 @Service
 public class NotificationEmailService {
 
+    private final BrevoEmailClient
+            brevoEmailClient;
 
-    private final JavaMailSender
-            notificationMailSender;
 
-
-    @Value("${app.notification-mail.username}")
+    @Value("${app.brevo.notification-sender-email}")
     private String fromEmail;
+
+
+    @Value("${app.brevo.notification-sender-name:FALDREN Technologies}")
+    private String fromName;
 
 
     @Value("${app.admin.notification-email}")
@@ -31,18 +27,13 @@ public class NotificationEmailService {
     private String frontendUrl;
 
 
-
     public NotificationEmailService(
-
-            @Qualifier("notificationMailSender")
-            JavaMailSender notificationMailSender
-
+            BrevoEmailClient brevoEmailClient
     ) {
 
-        this.notificationMailSender =
-                notificationMailSender;
+        this.brevoEmailClient =
+                brevoEmailClient;
     }
-
 
 
     // ==========================================
@@ -58,115 +49,75 @@ public class NotificationEmailService {
 
     ) {
 
+        String company =
+                companyName == null ||
+                companyName.isBlank()
+
+                        ? "Not provided"
+
+                        : companyName;
+
+
+        String subject =
+                "New Client Message - "
+                        + clientName;
+
+
+        String content =
+                "Hello FALDREN,\n\n"
+
+                        + "A client has sent a new message "
+                        + "through the FALDREN portal.\n\n"
+
+                        + "CLIENT DETAILS\n"
+                        + "--------------------------------\n"
+
+                        + "Name: "
+                        + clientName
+                        + "\n"
+
+                        + "Email: "
+                        + clientEmail
+                        + "\n"
+
+                        + "Company: "
+                        + company
+                        + "\n\n"
+
+                        + "MESSAGE\n"
+                        + "--------------------------------\n"
+
+                        + clientMessage
+                        + "\n\n"
+
+                        + "Open Admin Messages:\n"
+
+                        + frontendUrl
+                        + "/admin/messages"
+
+                        + "\n\n"
+                        + "— FALDREN Technologies";
+
 
         try {
 
-
-            MimeMessage mimeMessage =
-                    notificationMailSender
-                            .createMimeMessage();
-
-
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(
-                            mimeMessage,
-                            false,
-                            "UTF-8"
-                    );
-
-
-            helper.setFrom(
+            brevoEmailClient.sendEmail(
+                    fromName,
                     fromEmail,
-                    "FALDREN Technologies"
-            );
-
-
-            helper.setTo(
-                    adminNotificationEmail
-            );
-
-
-            helper.setSubject(
-
-                    "New Client Message - "
-                            + clientName
-
-            );
-
-
-            String company =
-                    companyName == null ||
-                    companyName.isBlank()
-
-                            ? "Not provided"
-
-                            : companyName;
-
-
-            helper.setText(
-
-                    "Hello FALDREN,\n\n"
-
-                            + "A client has sent a new message "
-                            + "through the FALDREN portal.\n\n"
-
-
-                            + "CLIENT DETAILS\n"
-                            + "--------------------------------\n"
-
-                            + "Name: "
-                            + clientName
-                            + "\n"
-
-                            + "Email: "
-                            + clientEmail
-                            + "\n"
-
-                            + "Company: "
-                            + company
-                            + "\n\n"
-
-
-                            + "MESSAGE\n"
-                            + "--------------------------------\n"
-
-                            + clientMessage
-                            + "\n\n"
-
-
-                            + "Open Admin Messages:\n"
-
-                            + frontendUrl
-                            + "/admin/messages"
-
-
-                            + "\n\n"
-
-                            + "— FALDREN Technologies"
-
-            );
-
-
-            notificationMailSender.send(
-                    mimeMessage
+                    adminNotificationEmail,
+                    subject,
+                    content
             );
 
 
         } catch (Exception exception) {
 
-
             throw new RuntimeException(
-
                     "Unable to send FALDREN notification email.",
-
                     exception
-
             );
-
         }
-
     }
-
 
 
     // ==========================================
@@ -181,155 +132,88 @@ public class NotificationEmailService {
 
     ) {
 
+        String subject =
+                "Welcome to FALDREN Technologies";
+
+
+        String content =
+                "Hello "
+                        + developerName
+                        + ",\n\n"
+
+                        + "Welcome to FALDREN Technologies.\n\n"
+
+                        + "You have been added as one of the "
+                        + "developers of FALDREN.\n\n"
+
+                        + "Your developer workspace account "
+                        + "has been created successfully.\n\n"
+
+                        + "LOGIN CREDENTIALS\n"
+                        + "--------------------------------\n"
+
+                        + "Email: "
+                        + developerEmail
+                        + "\n"
+
+                        + "Temporary Password: "
+                        + temporaryPassword
+                        + "\n\n"
+
+                        + "Developer Portal:\n"
+
+                        + frontendUrl
+                        + "/developer/login"
+
+                        + "\n\n"
+
+                        + "For security, you will be asked "
+                        + "to create a new password when "
+                        + "you sign in for the first time.\n\n"
+
+                        + "Build with focus. Ship with clarity.\n\n"
+
+                        + "— FALDREN Technologies";
+
 
         try {
 
-
-            MimeMessage mimeMessage =
-                    notificationMailSender
-                            .createMimeMessage();
-
-
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(
-                            mimeMessage,
-                            false,
-                            "UTF-8"
-                    );
-
-
-            helper.setFrom(
+            brevoEmailClient.sendEmail(
+                    fromName,
                     fromEmail,
-                    "FALDREN Technologies"
-            );
-
-
-            helper.setTo(
-                    developerEmail
-            );
-
-
-            helper.setSubject(
-                    "Welcome to FALDREN Technologies"
-            );
-
-
-            helper.setText(
-
-                    "Hello "
-                            + developerName
-                            + ",\n\n"
-
-
-                            + "Welcome to FALDREN Technologies.\n\n"
-
-
-                            + "You have been added as one of the "
-                            + "developers of FALDREN.\n\n"
-
-
-                            + "Your developer workspace account "
-                            + "has been created successfully.\n\n"
-
-
-                            + "LOGIN CREDENTIALS\n"
-                            + "--------------------------------\n"
-
-                            + "Email: "
-                            + developerEmail
-                            + "\n"
-
-                            + "Temporary Password: "
-                            + temporaryPassword
-                            + "\n\n"
-
-
-                            + "Developer Portal:\n"
-
-                            + frontendUrl
-                            + "/developer/login"
-                            + "\n\n"
-
-
-                            + "For security, you will be asked "
-                            + "to create a new password when "
-                            + "you sign in for the first time.\n\n"
-
-
-                            + "Build with focus. Ship with clarity.\n\n"
-
-
-                            + "— FALDREN Technologies"
-
-            );
-
-
-            notificationMailSender.send(
-                    mimeMessage
+                    developerEmail,
+                    subject,
+                    content
             );
 
 
         } catch (Exception exception) {
 
-
             throw new RuntimeException(
-
                     "Unable to send developer credentials email.",
-
                     exception
-
             );
-
         }
-
     }
 
 
     // ==========================================
-// ADMIN REPLY -> CLIENT EMAIL
-// ==========================================
+    // ADMIN REPLY -> CLIENT EMAIL
+    // ==========================================
 
-public void sendAdminReplyNotification(
+    public void sendAdminReplyNotification(
 
-        String clientName,
-        String clientEmail,
-        String adminMessage
+            String clientName,
+            String clientEmail,
+            String adminMessage
 
-) {
+    ) {
 
-    try {
-
-        MimeMessage mimeMessage =
-                notificationMailSender
-                        .createMimeMessage();
+        String subject =
+                "New message from FALDREN";
 
 
-        MimeMessageHelper helper =
-                new MimeMessageHelper(
-                        mimeMessage,
-                        false,
-                        "UTF-8"
-                );
-
-
-        helper.setFrom(
-                fromEmail,
-                "FALDREN Technologies"
-        );
-
-
-        helper.setTo(
-                clientEmail
-        );
-
-
-        helper.setSubject(
-                "New message from FALDREN"
-        );
-
-
-        helper.setText(
-
+        String content =
                 "Hello "
                         + clientName
                         + ",\n\n"
@@ -355,97 +239,69 @@ public void sendAdminReplyNotification(
                         + "simply log in to view the complete "
                         + "conversation and reply."
 
-                        + "\n\n— FALDREN Technologies"
-
-        );
+                        + "\n\n— FALDREN Technologies";
 
 
-        notificationMailSender.send(
-                mimeMessage
-        );
+        try {
+
+            brevoEmailClient.sendEmail(
+                    fromName,
+                    fromEmail,
+                    clientEmail,
+                    subject,
+                    content
+            );
 
 
-    } catch (Exception exception) {
+        } catch (Exception exception) {
 
-        throw new RuntimeException(
-
-                "Unable to send client notification email.",
-
-                exception
-
-        );
-
+            throw new RuntimeException(
+                    "Unable to send client notification email.",
+                    exception
+            );
+        }
     }
 
-}
 
-// ==========================================
-// NEW PROJECT REQUEST -> ADMIN EMAIL
-// ==========================================
+    // ==========================================
+    // NEW PROJECT REQUEST -> ADMIN EMAIL
+    // ==========================================
 
-public void sendNewProjectRequestNotification(
+    public void sendNewProjectRequestNotification(
 
-        String clientName,
-        String clientEmail,
-        String companyName,
+            String clientName,
+            String clientEmail,
+            String companyName,
 
-        String projectName,
-        String serviceType,
-        String description,
-        String requirements,
-        String businessGoal,
-        String budgetRange,
-        String expectedDeadline
+            String projectName,
+            String serviceType,
+            String description,
+            String requirements,
+            String businessGoal,
+            String budgetRange,
+            String expectedDeadline
 
-) {
-
-    try {
-
-        MimeMessage mimeMessage =
-                notificationMailSender
-                        .createMimeMessage();
-
-
-        MimeMessageHelper helper =
-                new MimeMessageHelper(
-                        mimeMessage,
-                        false,
-                        "UTF-8"
-                );
-
-
-        helper.setFrom(
-                fromEmail,
-                "FALDREN Technologies"
-        );
-
-
-        helper.setTo(
-                adminNotificationEmail
-        );
-
-
-        helper.setSubject(
-                "New Project Request - "
-                        + projectName
-        );
-
+    ) {
 
         String company =
                 companyName == null ||
                 companyName.isBlank()
 
                         ? "Not provided"
+
                         : companyName;
 
 
-        helper.setText(
+        String subject =
+                "New Project Request - "
+                        + projectName;
 
+
+        String content =
                 "Hello FALDREN,\n\n"
 
                         + "A new project request has been "
                         + "submitted through the client portal.\n\n"
-
 
                         + "CLIENT DETAILS\n"
                         + "--------------------------------\n"
@@ -461,7 +317,6 @@ public void sendNewProjectRequestNotification(
                         + "Company: "
                         + company
                         + "\n\n"
-
 
                         + "PROJECT DETAILS\n"
                         + "--------------------------------\n"
@@ -482,13 +337,11 @@ public void sendNewProjectRequestNotification(
                         + expectedDeadline
                         + "\n\n"
 
-
                         + "DESCRIPTION\n"
                         + "--------------------------------\n"
 
                         + description
                         + "\n\n"
-
 
                         + "REQUIREMENTS\n"
                         + "--------------------------------\n"
@@ -496,13 +349,11 @@ public void sendNewProjectRequestNotification(
                         + requirements
                         + "\n\n"
 
-
                         + "BUSINESS GOAL\n"
                         + "--------------------------------\n"
 
                         + businessGoal
                         + "\n\n"
-
 
                         + "Review Project Request:\n"
 
@@ -511,76 +362,49 @@ public void sendNewProjectRequestNotification(
 
                         + "\n\n"
 
-                        + "— FALDREN Technologies"
-
-        );
+                        + "— FALDREN Technologies";
 
 
-        notificationMailSender.send(
-                mimeMessage
-        );
+        try {
+
+            brevoEmailClient.sendEmail(
+                    fromName,
+                    fromEmail,
+                    adminNotificationEmail,
+                    subject,
+                    content
+            );
 
 
-    } catch (Exception exception) {
+        } catch (Exception exception) {
 
-        throw new RuntimeException(
-                "Unable to send project request notification email.",
-                exception
-        );
-
+            throw new RuntimeException(
+                    "Unable to send project request notification email.",
+                    exception
+            );
+        }
     }
-}
-// ==========================================
-// TASK ASSIGNMENT -> DEVELOPER EMAIL
-// ==========================================
-
-public void sendTaskAssignmentNotification(
-
-        String developerName,
-        String developerEmail,
-
-        String projectName,
-        String moduleName,
-        String description,
-
-        String branchName,
-        String priority,
-        String deadline,
-        String repoUrl
-
-) {
-
-    try {
-
-        MimeMessage mimeMessage =
-                notificationMailSender
-                        .createMimeMessage();
 
 
-        MimeMessageHelper helper =
-                new MimeMessageHelper(
-                        mimeMessage,
-                        false,
-                        "UTF-8"
-                );
+    // ==========================================
+    // TASK ASSIGNMENT -> DEVELOPER EMAIL
+    // ==========================================
 
+    public void sendTaskAssignmentNotification(
 
-        helper.setFrom(
-                fromEmail,
-                "FALDREN Technologies"
-        );
+            String developerName,
+            String developerEmail,
 
+            String projectName,
+            String moduleName,
+            String description,
 
-        helper.setTo(
-                developerEmail
-        );
+            String branchName,
+            String priority,
+            String deadline,
+            String repoUrl
 
-
-        helper.setSubject(
-                "New Task Assigned - "
-                        + moduleName
-        );
-
+    ) {
 
         String safeDescription =
                 description == null ||
@@ -609,15 +433,18 @@ public void sendTaskAssignmentNotification(
                         : repoUrl;
 
 
-        helper.setText(
+        String subject =
+                "New Task Assigned - "
+                        + moduleName;
 
+
+        String content =
                 "Hello "
                         + developerName
                         + ",\n\n"
 
                         + "A new development task has been "
                         + "assigned to you in FALDREN.\n\n"
-
 
                         + "TASK DETAILS\n"
                         + "--------------------------------\n"
@@ -646,13 +473,11 @@ public void sendTaskAssignmentNotification(
                         + safeRepo
                         + "\n\n"
 
-
                         + "DESCRIPTION\n"
                         + "--------------------------------\n"
 
                         + safeDescription
                         + "\n\n"
-
 
                         + "Open your assigned tasks:\n"
 
@@ -666,27 +491,26 @@ public void sendTaskAssignmentNotification(
 
                         + "\n\n"
 
-                        + "— FALDREN Technologies"
-
-        );
+                        + "— FALDREN Technologies";
 
 
-        notificationMailSender.send(
-                mimeMessage
-        );
+        try {
+
+            brevoEmailClient.sendEmail(
+                    fromName,
+                    fromEmail,
+                    developerEmail,
+                    subject,
+                    content
+            );
 
 
-    } catch (Exception exception) {
+        } catch (Exception exception) {
 
-        throw new RuntimeException(
-
-                "Unable to send task assignment email.",
-
-                exception
-
-        );
-
+            throw new RuntimeException(
+                    "Unable to send task assignment email.",
+                    exception
+            );
+        }
     }
-}
-
 }
