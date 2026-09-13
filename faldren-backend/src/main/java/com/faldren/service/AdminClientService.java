@@ -17,6 +17,8 @@ import com.faldren.repository.ProjectRepository;
 import com.faldren.repository.ProjectRequestRepository;
 import com.faldren.repository.UserRepository;
 
+import jakarta.persistence.EntityManager;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +46,9 @@ public class AdminClientService {
     private final MessageRepository
             messageRepository;
 
+    private final EntityManager
+            entityManager;
+
 
     public AdminClientService(
             UserRepository userRepository,
@@ -51,7 +56,8 @@ public class AdminClientService {
             ProjectRequestRepository projectRequestRepository,
             ProjectModuleRepository projectModuleRepository,
             ConversationRepository conversationRepository,
-            MessageRepository messageRepository
+            MessageRepository messageRepository,
+            EntityManager entityManager
     ) {
 
         this.userRepository =
@@ -71,6 +77,9 @@ public class AdminClientService {
 
         this.messageRepository =
                 messageRepository;
+
+        this.entityManager =
+                entityManager;
     }
 
 
@@ -121,7 +130,7 @@ public class AdminClientService {
 
 
         // ======================================
-        // DELETE CLIENT MESSAGES
+        // 1. DELETE CLIENT MESSAGES
         // ======================================
 
         List<Conversation> conversations =
@@ -166,7 +175,7 @@ public class AdminClientService {
 
 
         // ======================================
-        // GET CLIENT PROJECTS
+        // 2. GET CLIENT PROJECTS
         // ======================================
 
         List<Project> projects =
@@ -177,7 +186,7 @@ public class AdminClientService {
 
 
         // ======================================
-        // DELETE PROJECT MODULES
+        // 3. DELETE PROJECT MODULES
         // ======================================
 
         List<ProjectModule> modules =
@@ -208,7 +217,7 @@ public class AdminClientService {
 
 
         // ======================================
-        // DELETE PROJECTS
+        // 4. DELETE PROJECTS
         // ======================================
 
         if (!projects.isEmpty()) {
@@ -221,7 +230,7 @@ public class AdminClientService {
 
 
         // ======================================
-        // DELETE PROJECT REQUESTS
+        // 5. DELETE PROJECT REQUESTS
         // ======================================
 
         List<ProjectRequest> requests =
@@ -241,11 +250,54 @@ public class AdminClientService {
 
 
         // ======================================
-        // DELETE CLIENT ACCOUNT
+        // 6. CLEAR HIBERNATE PERSISTENCE CONTEXT
+        // ======================================
+
+        /*
+         * deleteAllInBatch() directly deletes rows
+         * from the database.
+         *
+         * But Hibernate can still keep old
+         * ProjectRequest / Project / Conversation
+         * objects in its persistence context.
+         *
+         * Clear them before deleting the client.
+         */
+
+        entityManager.clear();
+
+
+        // ======================================
+        // 7. FETCH CLIENT AGAIN
+        // ======================================
+
+        User freshClient =
+                userRepository
+                        .findById(clientId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Client account not found."
+                                )
+                        );
+
+
+        if (
+                freshClient.getRole()
+                        != Role.CLIENT
+        ) {
+
+            throw new RuntimeException(
+                    "Only client accounts can be deleted."
+            );
+        }
+
+
+        // ======================================
+        // 8. DELETE CLIENT ACCOUNT
         // ======================================
 
         userRepository.delete(
-                client
+                freshClient
         );
 
         userRepository.flush();
