@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/auth.css";
-
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 function Register() {
 
   const navigate = useNavigate();
