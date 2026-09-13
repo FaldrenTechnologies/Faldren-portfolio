@@ -30,11 +30,15 @@ public class AdminProjectModuleService {
     private final UserRepository
             userRepository;
 
+    private final NotificationEmailService
+            notificationEmailService;
+
 
     public AdminProjectModuleService(
             ProjectModuleRepository projectModuleRepository,
             ProjectRepository projectRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            NotificationEmailService notificationEmailService
     ) {
 
         this.projectModuleRepository =
@@ -45,6 +49,9 @@ public class AdminProjectModuleService {
 
         this.userRepository =
                 userRepository;
+
+        this.notificationEmailService =
+                notificationEmailService;
     }
 
 
@@ -263,14 +270,69 @@ public class AdminProjectModuleService {
         );
 
 
+        // ======================================
+        // DEADLINE
+        // ======================================
+
         module.setDeadline(
                 request.getDeadline()
         );
 
 
+        // ======================================
+        // SAVE MODULE
+        // ======================================
+
         ProjectModule savedModule =
                 projectModuleRepository
                         .save(module);
+
+
+        // ======================================
+        // SEND TASK EMAIL TO DEVELOPER
+        // ======================================
+
+        try {
+
+            notificationEmailService
+                    .sendTaskAssignmentNotification(
+
+                            developer.getFullName(),
+
+                            developer.getEmail(),
+
+                            project.getTitle(),
+
+                            savedModule.getModuleName(),
+
+                            savedModule.getDescription(),
+
+                            savedModule.getBranchName(),
+
+                            savedModule.getPriority(),
+
+                            savedModule.getDeadline() == null
+                                    ? null
+                                    : savedModule
+                                            .getDeadline()
+                                            .toString(),
+
+                            savedModule.getRepoUrl()
+                    );
+
+        } catch (Exception exception) {
+
+            // Task should still be created
+            // even if email notification fails.
+
+            System.err.println(
+
+                    "Task assignment email failed: "
+                            + exception.getMessage()
+
+            );
+
+        }
 
 
         return toResponse(
@@ -291,7 +353,9 @@ public class AdminProjectModuleService {
 
         Project project =
                 projectRepository
-                        .findById(projectId)
+                        .findById(
+                                projectId
+                        )
                         .orElseThrow(
                                 () ->
                                         new IllegalArgumentException(

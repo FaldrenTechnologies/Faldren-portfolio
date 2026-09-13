@@ -21,22 +21,44 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
+
 @Service
 public class MessageService {
 
-    private final UserRepository userRepository;
-    private final ConversationRepository conversationRepository;
-    private final MessageRepository messageRepository;
+    private final UserRepository
+            userRepository;
+
+    private final ConversationRepository
+            conversationRepository;
+
+    private final MessageRepository
+            messageRepository;
+
+    private final NotificationEmailService
+            notificationEmailService;
+
 
     public MessageService(
             UserRepository userRepository,
             ConversationRepository conversationRepository,
-            MessageRepository messageRepository
+            MessageRepository messageRepository,
+            NotificationEmailService notificationEmailService
     ) {
-        this.userRepository = userRepository;
-        this.conversationRepository = conversationRepository;
-        this.messageRepository = messageRepository;
+
+        this.userRepository =
+                userRepository;
+
+        this.conversationRepository =
+                conversationRepository;
+
+        this.messageRepository =
+                messageRepository;
+
+        this.notificationEmailService =
+                notificationEmailService;
     }
+
+
 
     // ==========================================
     // CLIENT - SEND MESSAGE
@@ -47,70 +69,154 @@ public class MessageService {
             String authenticatedEmail,
             String text
     ) {
-        User client = getClient(authenticatedEmail);
-        Conversation conversation = getOrCreateConversation(client);
 
-        Message message = createMessage(
-                conversation,
-                client,
-                text
+        User client =
+                getClient(
+                        authenticatedEmail
+                );
+
+
+        Conversation conversation =
+                getOrCreateConversation(
+                        client
+                );
+
+
+        Message message =
+                createMessage(
+                        conversation,
+                        client,
+                        text
+                );
+
+
+        Message saved =
+                messageRepository.save(
+                        message
+                );
+
+
+        // ======================================
+        // EMAIL FALDREN ABOUT CLIENT MESSAGE
+        // ======================================
+
+        try {
+
+            notificationEmailService
+                    .sendClientMessageNotification(
+
+                            client.getFullName(),
+
+                            client.getEmail(),
+
+                            client.getCompanyName(),
+
+                            saved.getMessage()
+                    );
+
+        } catch (Exception exception) {
+
+            // Important:
+            // Message must still work even
+            // if Gmail notification fails.
+
+            System.err.println(
+                    "FALDREN notification email failed: "
+                            + exception.getMessage()
+            );
+
+        }
+
+
+        return toMessageResponse(
+                saved
         );
-
-        Message saved = messageRepository.save(message);
-
-        return toMessageResponse(saved);
     }
+
+
 
     // ==========================================
     // CLIENT - GET OWN MESSAGES
     // ==========================================
 
     @Transactional(readOnly = true)
-    public List<MessageResponse> getClientMessages(
-            String authenticatedEmail
-    ) {
-        User client = getClient(authenticatedEmail);
+    public List<MessageResponse>
+            getClientMessages(
+                    String authenticatedEmail
+            ) {
 
-        Conversation conversation = conversationRepository
-                .findByClientAndType(
-                        client,
-                        ConversationType.CLIENT_SUPPORT
-                )
-                .orElse(null);
+        User client =
+                getClient(
+                        authenticatedEmail
+                );
+
+
+        Conversation conversation =
+                conversationRepository
+                        .findByClientAndType(
+                                client,
+                                ConversationType.CLIENT_SUPPORT
+                        )
+                        .orElse(null);
+
 
         if (conversation == null) {
+
             return List.of();
         }
 
+
         return messageRepository
-                .findByConversationOrderByCreatedAtAsc(conversation)
+                .findByConversationOrderByCreatedAtAsc(
+                        conversation
+                )
                 .stream()
-                .filter(message -> !message.isDeleted())
-                .map(this::toMessageResponse)
+                .filter(
+                        message ->
+                                !message.isDeleted()
+                )
+                .map(
+                        this::toMessageResponse
+                )
                 .toList();
     }
+
+
 
     // ==========================================
     // ADMIN - GET ALL CLIENT CONVERSATIONS
     // ==========================================
 
     @Transactional(readOnly = true)
-    public List<ConversationResponse> getAllConversations(
-            String authenticatedEmail
-    ) {
-        getAdmin(authenticatedEmail);
+    public List<ConversationResponse>
+            getAllConversations(
+                    String authenticatedEmail
+            ) {
+
+        getAdmin(
+                authenticatedEmail
+        );
+
 
         return conversationRepository
                 .findAllByOrderByUpdatedAtDesc()
                 .stream()
-                .filter(conversation ->
-                        conversation.getType()
-                                == ConversationType.CLIENT_SUPPORT
+                .filter(
+                        conversation ->
+                                conversation.getType()
+                                        ==
+                                        ConversationType.CLIENT_SUPPORT
                 )
-                .map(this::toConversationResponse)
+                .map(
+                        this::toConversationResponse
+                )
                 .sorted(
+
                         Comparator.comparing(
-                                ConversationResponse::getLastMessageTime,
+
+                                ConversationResponse
+                                        ::getLastMessageTime,
+
                                 Comparator.nullsLast(
                                         Comparator.reverseOrder()
                                 )
@@ -119,178 +225,331 @@ public class MessageService {
                 .toList();
     }
 
+
+
     // ==========================================
     // ADMIN - GET ONE CONVERSATION MESSAGES
     // ==========================================
 
     @Transactional(readOnly = true)
-    public List<MessageResponse> getConversationMessages(
-            String authenticatedEmail,
-            Long conversationId
-    ) {
-        getAdmin(authenticatedEmail);
-        Conversation conversation = getSupportConversation(conversationId);
+    public List<MessageResponse>
+            getConversationMessages(
+                    String authenticatedEmail,
+                    Long conversationId
+            ) {
+
+        getAdmin(
+                authenticatedEmail
+        );
+
+
+        Conversation conversation =
+                getSupportConversation(
+                        conversationId
+                );
+
 
         return messageRepository
-                .findByConversationOrderByCreatedAtAsc(conversation)
+                .findByConversationOrderByCreatedAtAsc(
+                        conversation
+                )
                 .stream()
-                .filter(message -> !message.isDeleted())
-                .map(this::toMessageResponse)
+                .filter(
+                        message ->
+                                !message.isDeleted()
+                )
+                .map(
+                        this::toMessageResponse
+                )
                 .toList();
     }
 
-    // ==========================================
-    // ADMIN - SEND MESSAGE
-    // ==========================================
+// ==========================================
+// ADMIN - SEND MESSAGE
+// ==========================================
 
-    @Transactional
-    public MessageResponse sendAdminMessage(
-            String authenticatedEmail,
-            Long conversationId,
-            String text
-    ) {
-        User admin = getAdmin(authenticatedEmail);
-        Conversation conversation = getSupportConversation(conversationId);
+@Transactional
+public MessageResponse sendAdminMessage(
+        String authenticatedEmail,
+        Long conversationId,
+        String text
+) {
 
-        Message message = createMessage(
-                conversation,
-                admin,
-                text
+    User admin =
+            getAdmin(
+                    authenticatedEmail
+            );
+
+
+    Conversation conversation =
+            getSupportConversation(
+                    conversationId
+            );
+
+
+    Message message =
+            createMessage(
+                    conversation,
+                    admin,
+                    text
+            );
+
+
+    Message saved =
+            messageRepository.save(
+                    message
+            );
+
+
+    // ======================================
+    // EMAIL CLIENT ABOUT ADMIN REPLY
+    // ======================================
+
+    User client =
+            conversation.getClient();
+
+
+    try {
+
+        notificationEmailService
+                .sendAdminReplyNotification(
+
+                        client.getFullName(),
+
+                        client.getEmail(),
+
+                        saved.getMessage()
+                );
+
+    } catch (Exception exception) {
+
+        // Chat message must still work
+        // even if email fails.
+
+        System.err.println(
+                "Client notification email failed: "
+                        + exception.getMessage()
         );
 
-        Message saved = messageRepository.save(message);
-
-        return toMessageResponse(saved);
     }
+
+
+    return toMessageResponse(
+            saved
+    );
+}
 
     // ==========================================
     // HELPERS - CLIENT
     // ==========================================
 
-    private User getClient(String email) {
-        User user = getUserByEmail(email);
+    private User getClient(
+            String email
+    ) {
+
+        User user =
+                getUserByEmail(
+                        email
+                );
+
 
         if (!user.isActive()) {
+
             throw new RuntimeException(
                     "Client account is disabled."
             );
         }
 
-        if (user.getRole() != Role.CLIENT) {
+
+        if (
+                user.getRole()
+                        != Role.CLIENT
+        ) {
+
             throw new RuntimeException(
                     "Client access denied."
             );
         }
 
+
         return user;
     }
+
+
 
     // ==========================================
     // HELPERS - ADMIN
     // ==========================================
 
-    private User getAdmin(String email) {
-        User user = getUserByEmail(email);
+    private User getAdmin(
+            String email
+    ) {
+
+        User user =
+                getUserByEmail(
+                        email
+                );
+
 
         if (!user.isActive()) {
+
             throw new RuntimeException(
                     "Admin account is disabled."
             );
         }
 
-        if (user.getRole() != Role.ADMIN) {
+
+        if (
+                user.getRole()
+                        != Role.ADMIN
+        ) {
+
             throw new RuntimeException(
                     "Admin access denied."
             );
         }
 
+
         return user;
     }
+
+
 
     // ==========================================
     // HELPERS - USER BY EMAIL
     // ==========================================
 
-    private User getUserByEmail(String email) {
-        if (email == null || email.isBlank()) {
+    private User getUserByEmail(
+            String email
+    ) {
+
+        if (
+                email == null ||
+                email.isBlank()
+        ) {
+
             throw new RuntimeException(
                     "Authenticated user not found."
             );
         }
 
+
         return userRepository
                 .findByEmail(
-                        email.trim().toLowerCase()
+                        email
+                                .trim()
+                                .toLowerCase()
                 )
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "User account not found."
-                        )
+                .orElseThrow(
+                        () ->
+                                new RuntimeException(
+                                        "User account not found."
+                                )
                 );
     }
+
+
 
     // ==========================================
     // HELPERS - GET OR CREATE CLIENT CHAT
     // ==========================================
 
-    private Conversation getOrCreateConversation(
-            User client
-    ) {
+    private Conversation
+            getOrCreateConversation(
+                    User client
+            ) {
+
         return conversationRepository
                 .findByClientAndType(
                         client,
                         ConversationType.CLIENT_SUPPORT
                 )
-                .orElseGet(() -> {
-                    Conversation conversation =
-                            new Conversation();
+                .orElseGet(
+                        () -> {
 
-                    conversation.setClient(client);
-                    conversation.setType(
-                            ConversationType.CLIENT_SUPPORT
-                    );
+                            Conversation conversation =
+                                    new Conversation();
 
-                    return conversationRepository
-                            .save(conversation);
-                });
+
+                            conversation.setClient(
+                                    client
+                            );
+
+
+                            conversation.setType(
+                                    ConversationType.CLIENT_SUPPORT
+                            );
+
+
+                            return conversationRepository
+                                    .save(
+                                            conversation
+                                    );
+                        }
+                );
     }
+
+
 
     // ==========================================
     // HELPERS - GET SUPPORT CONVERSATION
     // ==========================================
 
-    private Conversation getSupportConversation(
-            Long conversationId
-    ) {
-        if (conversationId == null) {
+    private Conversation
+            getSupportConversation(
+                    Long conversationId
+            ) {
+
+        if (
+                conversationId == null
+        ) {
+
             throw new RuntimeException(
                     "Conversation id is required."
             );
         }
 
-        Conversation conversation = conversationRepository
-                .findById(conversationId)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Conversation not found."
-                        )
-                );
 
-        if (conversation.getType()
-                != ConversationType.CLIENT_SUPPORT) {
+        Conversation conversation =
+                conversationRepository
+                        .findById(
+                                conversationId
+                        )
+                        .orElseThrow(
+                                () ->
+                                        new RuntimeException(
+                                                "Conversation not found."
+                                        )
+                        );
+
+
+        if (
+                conversation.getType()
+                        !=
+                        ConversationType.CLIENT_SUPPORT
+        ) {
+
             throw new RuntimeException(
                     "Invalid support conversation."
             );
         }
 
-        if (conversation.getClient() == null) {
+
+        if (
+                conversation.getClient()
+                        == null
+        ) {
+
             throw new RuntimeException(
                     "Conversation client not found."
             );
         }
 
+
         return conversation;
     }
+
+
 
     // ==========================================
     // HELPERS - CREATE MESSAGE
@@ -301,101 +560,197 @@ public class MessageService {
             User sender,
             String text
     ) {
-        String cleanedMessage = cleanMessage(text);
 
-        Message message = new Message();
+        String cleanedMessage =
+                cleanMessage(
+                        text
+                );
 
-        message.setConversation(conversation);
-        message.setSender(sender);
-        message.setType(MessageType.TEXT);
-        message.setMessage(cleanedMessage);
-        message.setDeleted(false);
+
+        Message message =
+                new Message();
+
+
+        message.setConversation(
+                conversation
+        );
+
+
+        message.setSender(
+                sender
+        );
+
+
+        message.setType(
+                MessageType.TEXT
+        );
+
+
+        message.setMessage(
+                cleanedMessage
+        );
+
+
+        message.setDeleted(
+                false
+        );
+
 
         return message;
     }
+
+
 
     // ==========================================
     // HELPERS - VALIDATE MESSAGE
     // ==========================================
 
-    private String cleanMessage(String text) {
+    private String cleanMessage(
+            String text
+    ) {
+
         if (text == null) {
+
             throw new RuntimeException(
                     "Message cannot be empty."
             );
         }
 
-        String cleaned = text.trim();
 
-        if (cleaned.isEmpty()) {
+        String cleaned =
+                text.trim();
+
+
+        if (
+                cleaned.isEmpty()
+        ) {
+
             throw new RuntimeException(
                     "Message cannot be empty."
             );
         }
 
-        if (cleaned.length() > 5000) {
+
+        if (
+                cleaned.length()
+                        > 5000
+        ) {
+
             throw new RuntimeException(
                     "Message is too long."
             );
         }
 
+
         return cleaned;
     }
+
+
 
     // ==========================================
     // DTO - MESSAGE RESPONSE
     // ==========================================
 
-    private MessageResponse toMessageResponse(
-            Message message
-    ) {
-        User sender = message.getSender();
+    private MessageResponse
+            toMessageResponse(
+                    Message message
+            ) {
+
+        User sender =
+                message.getSender();
+
 
         return new MessageResponse(
+
                 message.getId(),
+
                 sender.getId(),
+
                 sender.getFullName(),
-                sender.getRole().name(),
+
+                sender.getRole()
+                        .name(),
+
                 message.getMessage(),
-                message.getType().name(),
+
+                message.getType()
+                        .name(),
+
                 message.getCreatedAt()
+
         );
     }
+
+
 
     // ==========================================
     // DTO - CONVERSATION RESPONSE
     // ==========================================
 
-    private ConversationResponse toConversationResponse(
-            Conversation conversation
-    ) {
-        User client = conversation.getClient();
+    private ConversationResponse
+            toConversationResponse(
+                    Conversation conversation
+            ) {
 
-        List<Message> messages = messageRepository
-                .findByConversationOrderByCreatedAtAsc(conversation)
-                .stream()
-                .filter(message -> !message.isDeleted())
-                .toList();
+        User client =
+                conversation.getClient();
 
-        String lastMessage = null;
-        LocalDateTime lastMessageTime = null;
 
-        if (!messages.isEmpty()) {
-            Message latest = messages.get(
-                    messages.size() - 1
-            );
+        List<Message> messages =
+                messageRepository
+                        .findByConversationOrderByCreatedAtAsc(
+                                conversation
+                        )
+                        .stream()
+                        .filter(
+                                message ->
+                                        !message.isDeleted()
+                        )
+                        .toList();
 
-            lastMessage = latest.getMessage();
-            lastMessageTime = latest.getCreatedAt();
+
+        String lastMessage =
+                null;
+
+
+        LocalDateTime lastMessageTime =
+                null;
+
+
+        if (
+                !messages.isEmpty()
+        ) {
+
+            Message latest =
+                    messages.get(
+                            messages.size()
+                                    - 1
+                    );
+
+
+            lastMessage =
+                    latest.getMessage();
+
+
+            lastMessageTime =
+                    latest.getCreatedAt();
         }
 
+
         return new ConversationResponse(
+
                 conversation.getId(),
+
                 client.getId(),
+
                 client.getFullName(),
+
                 client.getCompanyName(),
+
                 lastMessage,
+
                 lastMessageTime
+
         );
     }
 }

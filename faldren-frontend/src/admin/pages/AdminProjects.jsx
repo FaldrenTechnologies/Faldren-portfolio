@@ -58,6 +58,21 @@ function AdminProjects() {
   const [error, setError] =
     useState("");
 
+  const [
+    openMenuId,
+    setOpenMenuId
+  ] = useState(null);
+
+  const [
+    projectToDelete,
+    setProjectToDelete
+  ] = useState(null);
+
+  const [
+    deletingProjectId,
+    setDeletingProjectId
+  ] = useState(null);
+
 
   // ==========================================
   // MODULE STATES
@@ -1006,6 +1021,140 @@ function AdminProjects() {
 
 
   // ==========================================
+  // DELETE PROJECT
+  // ==========================================
+
+  const handleDeleteProject =
+    async () => {
+
+      if (!projectToDelete) {
+        return;
+      }
+
+
+      const token =
+        getAdminToken();
+
+
+      if (!token) {
+
+        clearAdminSession();
+
+        return;
+      }
+
+
+      try {
+
+        setDeletingProjectId(
+          projectToDelete.id
+        );
+
+        setError("");
+
+
+        const response =
+          await fetch(
+            `${API_BASE}/api/admin/projects/${projectToDelete.id}`,
+            {
+              method: "DELETE",
+
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+
+          clearAdminSession();
+
+          return;
+        }
+
+
+        let data = {};
+
+        try {
+
+          data =
+            await response.json();
+
+        } catch {
+
+          data = {};
+        }
+
+
+        if (!response.ok) {
+
+          setError(
+            data.message ||
+            "Unable to delete project."
+          );
+
+          return;
+        }
+
+
+        setProjects(
+          current =>
+            current.filter(
+              project =>
+                project.id !==
+                projectToDelete.id
+            )
+        );
+
+
+        if (
+          selectedProject?.id ===
+          projectToDelete.id
+        ) {
+
+          closeModuleWorkspace();
+        }
+
+
+        setProjectToDelete(
+          null
+        );
+
+        setOpenMenuId(
+          null
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Project deletion error:",
+          error
+        );
+
+
+        setError(
+          "Unable to connect to the backend."
+        );
+
+
+      } finally {
+
+        setDeletingProjectId(
+          null
+        );
+
+      }
+
+    };
+
+
+  // ==========================================
   // UI
   // ==========================================
 
@@ -1471,15 +1620,23 @@ function AdminProjects() {
 
                     {/* ACTION */}
 
-                    <div className="admin-project-menu">
+                    <div
+                      className="admin-project-menu"
+                      style={{
+                        position: "relative"
+                      }}
+                    >
 
                       <button
                         type="button"
-                        aria-label="Manage project modules"
-                        title="Manage modules"
+                        aria-label="Project actions"
+                        title="Project actions"
                         onClick={() =>
-                          openModuleWorkspace(
-                            project
+                          setOpenMenuId(
+                            current =>
+                              current === project.id
+                                ? null
+                                : project.id
                           )
                         }
                       >
@@ -1490,6 +1647,90 @@ function AdminProjects() {
                         />
 
                       </button>
+
+
+                      {openMenuId === project.id && (
+
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "34px",
+                            right: 0,
+                            zIndex: 40,
+                            width: "155px",
+                            padding: "5px",
+                            background: "#f5f1e8",
+                            border:
+                              "1px solid rgba(25, 25, 22, 0.18)",
+                            boxShadow:
+                              "0 12px 30px rgba(20, 20, 18, 0.12)"
+                          }}
+                        >
+
+                          <button
+                            type="button"
+                            style={{
+                              width: "100%",
+                              padding: "10px 12px",
+                              border: 0,
+                              background: "transparent",
+                              textAlign: "left",
+                              fontFamily: "inherit",
+                              fontSize: "11px",
+                              color: "#1c1c19",
+                              cursor: "pointer"
+                            }}
+                            onClick={() => {
+
+                              setOpenMenuId(
+                                null
+                              );
+
+                              openModuleWorkspace(
+                                project
+                              );
+
+                            }}
+                          >
+
+                            Manage modules
+
+                          </button>
+
+
+                          <button
+                            type="button"
+                            style={{
+                              width: "100%",
+                              padding: "10px 12px",
+                              border: 0,
+                              background: "transparent",
+                              textAlign: "left",
+                              fontFamily: "inherit",
+                              fontSize: "11px",
+                              color: "#8a4037",
+                              cursor: "pointer"
+                            }}
+                            onClick={() => {
+
+                              setProjectToDelete(
+                                project
+                              );
+
+                              setOpenMenuId(
+                                null
+                              );
+
+                            }}
+                          >
+
+                            Delete project
+
+                          </button>
+
+                        </div>
+
+                      )}
 
                     </div>
 
@@ -2238,6 +2479,201 @@ function AdminProjects() {
             </div>
 
           </aside>
+
+        </div>
+
+      )}
+
+
+      {/* ========================================
+          DELETE PROJECT CONFIRMATION
+      ======================================== */}
+
+      {projectToDelete && (
+
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "24px",
+            background:
+              "rgba(16, 16, 14, 0.46)",
+            backdropFilter:
+              "blur(3px)"
+          }}
+          onClick={() => {
+
+            if (
+              deletingProjectId === null
+            ) {
+
+              setProjectToDelete(
+                null
+              );
+
+            }
+
+          }}
+        >
+
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              padding: "32px",
+              background: "#f3eee4",
+              border:
+                "1px solid rgba(25, 25, 22, 0.22)"
+            }}
+            onClick={
+              event =>
+                event.stopPropagation()
+            }
+          >
+
+            <span
+              style={{
+                display: "block",
+                marginBottom: "20px",
+                fontSize: "9px",
+                letterSpacing: "0.18em",
+                color: "#824b42"
+              }}
+            >
+              DELETE PROJECT
+            </span>
+
+
+            <h2
+              style={{
+                margin: "0 0 15px",
+                fontSize: "30px",
+                fontWeight: 500,
+                letterSpacing: "-0.03em"
+              }}
+            >
+              Are you sure?
+            </h2>
+
+
+            <p
+              style={{
+                margin: 0,
+                fontSize: "14px",
+                lineHeight: 1.7
+              }}
+            >
+
+              <strong>
+                {projectToDelete.title}
+              </strong>
+
+              {" "}will be permanently deleted.
+
+            </p>
+
+
+            <small
+              style={{
+                display: "block",
+                marginTop: "12px",
+                fontSize: "11px",
+                lineHeight: 1.6,
+                opacity: 0.58
+              }}
+            >
+
+              Assigned tasks and modules
+              belonging to this project will
+              also be removed.
+
+            </small>
+
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "10px",
+                marginTop: "30px"
+              }}
+            >
+
+              <button
+                type="button"
+                disabled={
+                  deletingProjectId !== null
+                }
+                onClick={() =>
+                  setProjectToDelete(
+                    null
+                  )
+                }
+                style={{
+                  minWidth: "95px",
+                  padding: "11px 16px",
+                  border:
+                    "1px solid rgba(25, 25, 22, 0.25)",
+                  background: "transparent",
+                  color: "#1c1c19",
+                  fontFamily: "inherit",
+                  fontSize: "11px",
+                  cursor:
+                    deletingProjectId !== null
+                      ? "not-allowed"
+                      : "pointer",
+                  opacity:
+                    deletingProjectId !== null
+                      ? 0.5
+                      : 1
+                }}
+              >
+
+                Cancel
+
+              </button>
+
+
+              <button
+                type="button"
+                disabled={
+                  deletingProjectId !== null
+                }
+                onClick={
+                  handleDeleteProject
+                }
+                style={{
+                  minWidth: "95px",
+                  padding: "11px 16px",
+                  border:
+                    "1px solid #7c4038",
+                  background: "#7c4038",
+                  color: "#f6f1e8",
+                  fontFamily: "inherit",
+                  fontSize: "11px",
+                  cursor:
+                    deletingProjectId !== null
+                      ? "not-allowed"
+                      : "pointer",
+                  opacity:
+                    deletingProjectId !== null
+                      ? 0.5
+                      : 1
+                }}
+              >
+
+                {deletingProjectId !== null
+                  ? "Deleting..."
+                  : "Delete"}
+
+              </button>
+
+            </div>
+
+          </div>
 
         </div>
 

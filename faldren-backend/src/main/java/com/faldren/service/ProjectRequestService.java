@@ -32,24 +32,28 @@ public class ProjectRequestService {
 
     private final ProjectRepository
             projectRepository;
+    private final NotificationEmailService
+        notificationEmailService;
 
+public ProjectRequestService(
+        UserRepository userRepository,
+        ProjectRequestRepository projectRequestRepository,
+        ProjectRepository projectRepository,
+        NotificationEmailService notificationEmailService
+) {
 
-    public ProjectRequestService(
-            UserRepository userRepository,
-            ProjectRequestRepository projectRequestRepository,
-            ProjectRepository projectRepository
-    ) {
+    this.userRepository =
+            userRepository;
 
-        this.userRepository =
-                userRepository;
+    this.projectRequestRepository =
+            projectRequestRepository;
 
-        this.projectRequestRepository =
-                projectRequestRepository;
+    this.projectRepository =
+            projectRepository;
 
-        this.projectRepository =
-                projectRepository;
-    }
-
+    this.notificationEmailService =
+            notificationEmailService;
+}
 
 
     // ==========================================
@@ -118,14 +122,59 @@ public class ProjectRequestService {
                 ProjectRequestStatus.PENDING
         );
 
+ProjectRequest saved =
+        projectRequestRepository.save(
+                projectRequest
+        );
 
-        ProjectRequest saved =
-                projectRequestRepository.save(
-                        projectRequest
-                );
+
+// ======================================
+// EMAIL ADMIN ABOUT NEW PROJECT
+// ======================================
+
+try {
+
+    notificationEmailService
+            .sendNewProjectRequestNotification(
+
+                    client.getFullName(),
+
+                    client.getEmail(),
+
+                    client.getCompanyName(),
+
+                    saved.getProjectName(),
+
+                    saved.getServiceType(),
+
+                    saved.getDescription(),
+
+                    saved.getRequirements(),
+
+                    saved.getBusinessGoal(),
+
+                    saved.getBudgetRange(),
+
+                    saved.getExpectedDeadline() == null
+                            ? "Not specified"
+                            : saved.getExpectedDeadline()
+                                    .toString()
+            );
+
+} catch (Exception exception) {
+
+    // Project request should still be
+    // created even if email fails.
+
+    System.err.println(
+            "Project request notification email failed: "
+                    + exception.getMessage()
+    );
+
+}
 
 
-        return toRequestResponse(saved);
+return toRequestResponse(saved);
     }
 
 

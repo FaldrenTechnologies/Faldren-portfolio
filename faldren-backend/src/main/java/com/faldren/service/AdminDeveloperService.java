@@ -18,12 +18,17 @@ import java.util.List;
 public class AdminDeveloperService {
 
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
+
+    private final NotificationEmailService
+            notificationEmailService;
 
 
     public AdminDeveloperService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            NotificationEmailService notificationEmailService
     ) {
 
         this.userRepository =
@@ -31,6 +36,9 @@ public class AdminDeveloperService {
 
         this.passwordEncoder =
                 passwordEncoder;
+
+        this.notificationEmailService =
+                notificationEmailService;
     }
 
 
@@ -44,7 +52,9 @@ public class AdminDeveloperService {
 
         if (
                 request.getFullName() == null ||
-                request.getFullName().trim().isEmpty()
+                request.getFullName()
+                        .trim()
+                        .isEmpty()
         ) {
 
             throw new IllegalArgumentException(
@@ -55,7 +65,9 @@ public class AdminDeveloperService {
 
         if (
                 request.getEmail() == null ||
-                request.getEmail().trim().isEmpty()
+                request.getEmail()
+                        .trim()
+                        .isEmpty()
         ) {
 
             throw new IllegalArgumentException(
@@ -66,7 +78,8 @@ public class AdminDeveloperService {
 
         if (
                 request.getPassword() == null ||
-                request.getPassword().length() < 8
+                request.getPassword()
+                        .length() < 8
         ) {
 
             throw new IllegalArgumentException(
@@ -94,6 +107,12 @@ public class AdminDeveloperService {
         }
 
 
+        // Keep temporary password
+        // only for sending credential email
+        String temporaryPassword =
+                request.getPassword();
+
+
         User developer =
                 new User();
 
@@ -112,10 +131,12 @@ public class AdminDeveloperService {
 
         developer.setPhone(
                 request.getPhone() == null
+
                         ? null
+
                         : request
-                        .getPhone()
-                        .trim()
+                                .getPhone()
+                                .trim()
         );
 
 
@@ -126,7 +147,7 @@ public class AdminDeveloperService {
 
         developer.setPassword(
                 passwordEncoder.encode(
-                        request.getPassword()
+                        temporaryPassword
                 )
         );
 
@@ -152,11 +173,41 @@ public class AdminDeveloperService {
                 );
 
 
+        // ======================================
+        // SEND LOGIN CREDENTIALS
+        // ======================================
+
+        try {
+
+            notificationEmailService
+                    .sendDeveloperCredentials(
+
+                            savedDeveloper
+                                    .getFullName(),
+
+                            savedDeveloper
+                                    .getEmail(),
+
+                            temporaryPassword
+                    );
+
+        } catch (Exception exception) {
+
+            // Developer creation should
+            // still succeed if Gmail fails.
+
+            System.err.println(
+                    "Developer credentials email failed: "
+                            + exception.getMessage()
+            );
+
+        }
+
+
         return toResponse(
                 savedDeveloper
         );
     }
-
 
 
     // ==========================================
@@ -178,9 +229,8 @@ public class AdminDeveloperService {
     }
 
 
-
     // ==========================================
-    // CONVERT USER -> RESPONSE
+    // RESPONSE
     // ==========================================
 
     private AdminDeveloperResponse toResponse(

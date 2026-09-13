@@ -2388,18 +2388,15 @@
   justify-content: flex-end;
 }
 
-
-.admin-project-menu button {
+/* Only the main 3-dot button */
+.admin-project-menu > button {
   width: 38px;
-
   height: 38px;
 
   display: grid;
-
   place-items: center;
 
   border: 0;
-
   background: transparent;
 
   color: #777168;
@@ -2407,11 +2404,9 @@
   cursor: pointer;
 }
 
-
-.admin-project-menu button:hover {
+.admin-project-menu > button:hover {
   background: rgba(25,26,22,.06);
 }
-
 
 /* EMPTY */
 

@@ -37,6 +37,15 @@ function AdminDevelopers() {
   const [error, setError] =
     useState("");
 
+  const [openMenuId, setOpenMenuId] =
+    useState(null);
+
+  const [developerToDelete, setDeveloperToDelete] =
+    useState(null);
+
+  const [deletingDeveloperId, setDeletingDeveloperId] =
+    useState(null);
+
   const [showAddDeveloper, setShowAddDeveloper] =
     useState(false);
 
@@ -367,6 +376,155 @@ function AdminDevelopers() {
 
     };
 
+
+
+  // ==========================================
+  // DELETE DEVELOPER
+  // ==========================================
+
+  const handleDeleteDeveloper =
+    async () => {
+
+      if (!developerToDelete) {
+        return;
+      }
+
+
+      const token =
+        localStorage.getItem(
+          "adminToken"
+        );
+
+
+      if (!token) {
+
+        window.location.href =
+          "/admin/login";
+
+        return;
+      }
+
+
+      try {
+
+        setDeletingDeveloperId(
+          developerToDelete.id
+        );
+
+        setError("");
+
+
+        const response =
+          await fetch(
+            `${API_BASE}/api/admin/developers/${developerToDelete.id}`,
+            {
+              method: "DELETE",
+
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+
+          localStorage.removeItem(
+            "adminToken"
+          );
+
+          localStorage.removeItem(
+            "adminName"
+          );
+
+          localStorage.removeItem(
+            "adminEmail"
+          );
+
+          localStorage.removeItem(
+            "adminRole"
+          );
+
+          localStorage.removeItem(
+            "adminLoggedIn"
+          );
+
+
+          window.location.href =
+            "/admin/login";
+
+          return;
+        }
+
+
+        let data = {};
+
+        try {
+
+          data =
+            await response.json();
+
+        } catch {
+
+          data = {};
+        }
+
+
+        if (!response.ok) {
+
+          setError(
+            data.message ||
+            "Unable to delete developer."
+          );
+
+          return;
+        }
+
+
+        setDevelopers(
+          current =>
+            current.filter(
+              developer =>
+                developer.id !==
+                developerToDelete.id
+            )
+        );
+
+
+        setDeveloperToDelete(
+          null
+        );
+
+        setOpenMenuId(
+          null
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Delete developer error:",
+          error
+        );
+
+
+        setError(
+          "Unable to connect to the server."
+        );
+
+
+      } finally {
+
+        setDeletingDeveloperId(
+          null
+        );
+      }
+
+    };
 
 
   return (
@@ -727,11 +885,38 @@ function AdminDevelopers() {
 
                     {/* ACTION */}
 
-                    <div className="admin-client-menu">
+                    <div
+                      style={{
+                        position: "relative",
+                        display: "flex",
+                        justifyContent: "flex-end"
+                      }}
+                    >
 
                       <button
                         type="button"
                         aria-label="Developer actions"
+                        title="Developer actions"
+
+                        style={{
+                          width: "38px",
+                          height: "38px",
+                          display: "grid",
+                          placeItems: "center",
+                          border: 0,
+                          background: "transparent",
+                          color: "#777168",
+                          cursor: "pointer"
+                        }}
+
+                        onClick={() =>
+                          setOpenMenuId(
+                            current =>
+                              current === developer.id
+                                ? null
+                                : developer.id
+                          )
+                        }
                       >
 
                         <MoreHorizontal
@@ -740,6 +925,63 @@ function AdminDevelopers() {
                         />
 
                       </button>
+
+
+                      {openMenuId === developer.id && (
+
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "36px",
+                            right: 0,
+                            zIndex: 50,
+                            width: "155px",
+                            padding: "5px",
+                            background: "#f5f1e8",
+                            border:
+                              "1px solid rgba(25, 25, 22, 0.18)",
+                            boxShadow:
+                              "0 12px 30px rgba(20, 20, 18, 0.12)"
+                          }}
+                        >
+
+                          <button
+                            type="button"
+
+                            style={{
+                              width: "100%",
+                              height: "auto",
+                              display: "block",
+                              padding: "10px 12px",
+                              border: 0,
+                              background: "transparent",
+                              textAlign: "left",
+                              fontFamily: "inherit",
+                              fontSize: "11px",
+                              color: "#8a4037",
+                              cursor: "pointer"
+                            }}
+
+                            onClick={() => {
+
+                              setDeveloperToDelete(
+                                developer
+                              );
+
+                              setOpenMenuId(
+                                null
+                              );
+
+                            }}
+                          >
+
+                            Delete developer
+
+                          </button>
+
+                        </div>
+
+                      )}
 
                     </div>
 
@@ -1049,6 +1291,204 @@ function AdminDevelopers() {
               </div>
 
             </form>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* ======================================
+          DELETE DEVELOPER CONFIRMATION
+      ====================================== */}
+
+      {developerToDelete && (
+
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 1200,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "24px",
+            background:
+              "rgba(16, 16, 14, 0.46)",
+            backdropFilter:
+              "blur(3px)"
+          }}
+
+          onMouseDown={(event) => {
+
+            if (
+              event.target ===
+              event.currentTarget &&
+              deletingDeveloperId === null
+            ) {
+
+              setDeveloperToDelete(
+                null
+              );
+
+            }
+
+          }}
+        >
+
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              padding: "32px",
+              background: "#f3eee4",
+              border:
+                "1px solid rgba(25, 25, 22, 0.22)",
+              color: "#1c1c19"
+            }}
+          >
+
+            <span
+              style={{
+                display: "block",
+                marginBottom: "20px",
+                fontSize: "9px",
+                letterSpacing: "0.18em",
+                color: "#824b42"
+              }}
+            >
+              DELETE DEVELOPER
+            </span>
+
+
+            <h2
+              style={{
+                margin: "0 0 15px",
+                fontSize: "30px",
+                fontWeight: 500,
+                letterSpacing: "-0.03em"
+              }}
+            >
+              Are you sure?
+            </h2>
+
+
+            <p
+              style={{
+                margin: 0,
+                fontSize: "14px",
+                lineHeight: 1.7
+              }}
+            >
+
+              <strong>
+                {developerToDelete.fullName}
+              </strong>
+
+              {" "}will be permanently deleted.
+
+            </p>
+
+
+            <small
+              style={{
+                display: "block",
+                marginTop: "12px",
+                fontSize: "11px",
+                lineHeight: 1.6,
+                opacity: 0.58
+              }}
+            >
+              Assigned modules and tasks for this
+              developer will also be removed.
+            </small>
+
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "10px",
+                marginTop: "30px"
+              }}
+            >
+
+              <button
+                type="button"
+
+                disabled={
+                  deletingDeveloperId !== null
+                }
+
+                onClick={() =>
+                  setDeveloperToDelete(
+                    null
+                  )
+                }
+
+                style={{
+                  minWidth: "95px",
+                  padding: "11px 16px",
+                  border:
+                    "1px solid rgba(25, 25, 22, 0.25)",
+                  background: "transparent",
+                  color: "#1c1c19",
+                  fontFamily: "inherit",
+                  fontSize: "11px",
+                  cursor:
+                    deletingDeveloperId !== null
+                      ? "not-allowed"
+                      : "pointer",
+                  opacity:
+                    deletingDeveloperId !== null
+                      ? 0.5
+                      : 1
+                }}
+              >
+
+                Cancel
+
+              </button>
+
+
+              <button
+                type="button"
+
+                disabled={
+                  deletingDeveloperId !== null
+                }
+
+                onClick={
+                  handleDeleteDeveloper
+                }
+
+                style={{
+                  minWidth: "95px",
+                  padding: "11px 16px",
+                  border:
+                    "1px solid #7c4038",
+                  background: "#7c4038",
+                  color: "#f6f1e8",
+                  fontFamily: "inherit",
+                  fontSize: "11px",
+                  cursor:
+                    deletingDeveloperId !== null
+                      ? "not-allowed"
+                      : "pointer",
+                  opacity:
+                    deletingDeveloperId !== null
+                      ? 0.5
+                      : 1
+                }}
+              >
+
+                {deletingDeveloperId !== null
+                  ? "Deleting..."
+                  : "Delete"}
+
+              </button>
+
+            </div>
 
           </div>
 

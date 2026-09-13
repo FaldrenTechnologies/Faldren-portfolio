@@ -1,6 +1,5 @@
 import React, {
   useEffect,
-  useMemo,
   useState
 } from "react";
 
@@ -80,7 +79,8 @@ function AdminDashboard() {
 
         const [
           projectResponse,
-          requestResponse
+          requestResponse,
+          clientResponse
         ] =
           await Promise.all([
 
@@ -102,6 +102,16 @@ function AdminDashboard() {
                     `Bearer ${token}`
                 }
               }
+            ),
+
+            fetch(
+              `${API_BASE}/api/admin/clients`,
+              {
+                headers: {
+                  Authorization:
+                    `Bearer ${token}`
+                }
+              }
             )
 
           ]);
@@ -111,7 +121,9 @@ function AdminDashboard() {
           projectResponse.status === 401 ||
           projectResponse.status === 403 ||
           requestResponse.status === 401 ||
-          requestResponse.status === 403
+          requestResponse.status === 403 ||
+          clientResponse.status === 401 ||
+          clientResponse.status === 403
         ) {
 
           localStorage.removeItem(
@@ -148,6 +160,9 @@ function AdminDashboard() {
         const requestData =
           await requestResponse.json();
 
+        const clientData =
+          await clientResponse.json();
+
 
         if (!projectResponse.ok) {
 
@@ -167,6 +182,15 @@ function AdminDashboard() {
         }
 
 
+        if (!clientResponse.ok) {
+
+          throw new Error(
+            clientData.message ||
+            "Unable to load clients."
+          );
+        }
+
+
         setProjects(
           Array.isArray(projectData)
             ? projectData
@@ -181,44 +205,11 @@ function AdminDashboard() {
         );
 
 
-        // ======================================
-        // TRY TO LOAD REAL CLIENT COUNT
-        // ======================================
-
-        try {
-
-          const clientResponse =
-            await fetch(
-              `${API_BASE}/api/admin/clients`,
-              {
-                headers: {
-                  Authorization:
-                    `Bearer ${token}`
-                }
-              }
-            );
-
-
-          if (clientResponse.ok) {
-
-            const clientData =
-              await clientResponse.json();
-
-
-            setClients(
-              Array.isArray(clientData)
-                ? clientData
-                : []
-            );
-
-          }
-
-        } catch {
-
-          // Client endpoint is optional.
-          // Fallback count is calculated below.
-
-        }
+        setClients(
+          Array.isArray(clientData)
+            ? clientData
+            : []
+        );
 
 
       } catch (error) {
@@ -247,6 +238,49 @@ function AdminDashboard() {
   useEffect(() => {
 
     loadDashboard();
+
+
+    const refreshDashboard = () => {
+      loadDashboard();
+    };
+
+
+    const handleVisibilityChange = () => {
+
+      if (
+        document.visibilityState ===
+        "visible"
+      ) {
+
+        loadDashboard();
+      }
+
+    };
+
+
+    window.addEventListener(
+      "focus",
+      refreshDashboard
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange
+    );
+
+
+    return () => {
+
+      window.removeEventListener(
+        "focus",
+        refreshDashboard
+      );
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
+    };
 
   }, []);
 
@@ -280,70 +314,11 @@ function AdminDashboard() {
 
 
   // ==========================================
-  // FALLBACK UNIQUE CLIENT COUNT
+  // REAL CLIENT COUNT
   // ==========================================
 
-  const uniqueClientCount =
-    useMemo(() => {
-
-      const ids =
-        new Set();
-
-
-      requests.forEach(
-        request => {
-
-          if (request.clientId) {
-
-            ids.add(
-              String(
-                request.clientId
-              )
-            );
-
-          } else if (
-            request.clientEmail
-          ) {
-
-            ids.add(
-              request.clientEmail
-            );
-
-          }
-
-        }
-      );
-
-
-      projects.forEach(
-        project => {
-
-          if (project.clientId) {
-
-            ids.add(
-              String(
-                project.clientId
-              )
-            );
-
-          }
-
-        }
-      );
-
-
-      return ids.size;
-
-    }, [
-      requests,
-      projects
-    ]);
-
-
   const totalClients =
-    clients.length > 0
-      ? clients.length
-      : uniqueClientCount;
+    clients.length;
 
 
   const stats = [
