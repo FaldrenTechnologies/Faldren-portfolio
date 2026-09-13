@@ -83,7 +83,7 @@ function Register() {
 
       const response =
         await fetch(
-          "http://localhost:8080/api/client/auth/send-otp",
+          `${API_BASE}/api/client/auth/send-otp`,
           {
             method: "POST",
 
@@ -184,7 +184,7 @@ function Register() {
 
       const response =
         await fetch(
-          "http://localhost:8080/api/client/auth/verify-register",
+  `${API_BASE}/api/client/auth/verify-register`,
           {
             method: "POST",
 
@@ -271,7 +271,7 @@ function Register() {
 
       const response =
         await fetch(
-          "http://localhost:8080/api/client/auth/send-otp",
+          `${API_BASE}/api/client/auth/send-otp`,
           {
             method: "POST",
 

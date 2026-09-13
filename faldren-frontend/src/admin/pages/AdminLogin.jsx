@@ -11,6 +11,8 @@ import {
 
 import "../admin.css";
 
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 // ==========================================
 // CLEAR CLIENT SESSION
@@ -129,7 +131,7 @@ function AdminLogin() {
 
       const response =
         await fetch(
-          "http://localhost:8080/api/admin/auth/login",
+          `${API_BASE}/api/admin/auth/login`,
           {
             method: "POST",
 

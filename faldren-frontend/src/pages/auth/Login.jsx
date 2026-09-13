@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/auth.css";
-
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 function Login() {
 
@@ -83,7 +84,7 @@ useEffect(() => {
 
       const response =
         await fetch(
-          "http://localhost:8080/api/client/auth/login",
+          `${API_BASE}/api/client/auth/login`,
           {
             method: "POST",
 
