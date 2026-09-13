@@ -1,0 +1,16 @@
+node_modules/
+dist/
+target/
+
+.env
+.env.*
+!.env.example
+
+*.log
+
+faldren-backend/backend-error.txt
+faldren-backend/latest-error.txt
+
+.idea/
+.vscode/
+.DS_Store
