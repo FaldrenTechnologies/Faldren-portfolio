@@ -2,9 +2,9 @@ package com.faldren.config;
 
 import com.faldren.security.JwtAuthenticationFilter;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.http.HttpMethod;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,20 +22,19 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-
 @Configuration
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter
-            jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
 
 
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
-
-        this.jwtAuthenticationFilter =
-                jwtAuthenticationFilter;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
 
@@ -45,7 +44,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
@@ -129,6 +127,7 @@ public class SecurityConfig {
                                 HttpMethod.POST,
 
                                 "/api/client/auth/send-otp",
+                                "/api/client/auth/verify-register",
                                 "/api/client/auth/verify-otp",
                                 "/api/client/auth/register",
                                 "/api/client/auth/login"
@@ -215,16 +214,17 @@ public class SecurityConfig {
     // ==========================================
 
     @Bean
-    public CorsConfigurationSource
-    corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
 
+        // Local frontend + Production frontend
         configuration.setAllowedOrigins(
                 List.of(
-                        "http://localhost:5173"
+                        "http://localhost:5173",
+                        frontendUrl
                 )
         );
 
@@ -249,9 +249,7 @@ public class SecurityConfig {
         );
 
 
-        configuration.setAllowCredentials(
-                false
-        );
+        configuration.setAllowCredentials(false);
 
 
         UrlBasedCorsConfigurationSource source =
