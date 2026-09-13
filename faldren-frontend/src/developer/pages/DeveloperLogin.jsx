@@ -20,7 +20,8 @@ import "../../admin/admin.css";
 
 
 const API_BASE =
-  (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080");
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:8080";
 
 
 // ==========================================
@@ -29,11 +30,25 @@ const API_BASE =
 
 const clearAdminSession = () => {
 
-  localStorage.removeItem("adminToken");
-  localStorage.removeItem("adminRole");
-  localStorage.removeItem("adminName");
-  localStorage.removeItem("adminEmail");
-  localStorage.removeItem("adminLoggedIn");
+  localStorage.removeItem(
+    "adminToken"
+  );
+
+  localStorage.removeItem(
+    "adminRole"
+  );
+
+  localStorage.removeItem(
+    "adminName"
+  );
+
+  localStorage.removeItem(
+    "adminEmail"
+  );
+
+  localStorage.removeItem(
+    "adminLoggedIn"
+  );
 
 };
 
@@ -44,11 +59,25 @@ const clearAdminSession = () => {
 
 const clearClientSession = () => {
 
-  localStorage.removeItem("clientToken");
-  localStorage.removeItem("clientRole");
-  localStorage.removeItem("clientName");
-  localStorage.removeItem("clientEmail");
-  localStorage.removeItem("clientCompany");
+  localStorage.removeItem(
+    "clientToken"
+  );
+
+  localStorage.removeItem(
+    "clientRole"
+  );
+
+  localStorage.removeItem(
+    "clientName"
+  );
+
+  localStorage.removeItem(
+    "clientEmail"
+  );
+
+  localStorage.removeItem(
+    "clientCompany"
+  );
 
 };
 
@@ -74,73 +103,20 @@ function DeveloperLogin() {
   // STATES
   // ==========================================
 
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [
+    showPassword,
+    setShowPassword
+  ] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [
+    loading,
+    setLoading
+  ] = useState(false);
 
-  const [error, setError] =
-    useState("");
-
-
-  // ==========================================
-  // ALREADY LOGGED IN
-  // ==========================================
-
-  useEffect(() => {
-
-    const token =
-      localStorage.getItem(
-        "developerToken"
-      );
-
-    const role =
-      localStorage.getItem(
-        "developerRole"
-      );
-
-    const mustChangePassword =
-      localStorage.getItem(
-        "developerMustChangePassword"
-      );
-
-
-    if (
-      token &&
-      role === "DEVELOPER"
-    ) {
-
-      clearAdminSession();
-      clearClientSession();
-
-
-      if (
-        mustChangePassword === "true"
-      ) {
-
-        navigate(
-          "/developer/change-password",
-          {
-            replace: true
-          }
-        );
-
-      } else {
-
-        navigate(
-          "/developer/dashboard",
-          {
-            replace: true
-          }
-        );
-
-      }
-
-    }
-
-  }, [navigate]);
-
+  const [
+    error,
+    setError
+  ] = useState("");
 
 
   // ==========================================
@@ -168,7 +144,6 @@ function DeveloperLogin() {
   }, [error]);
 
 
-
   // ==========================================
   // LOGIN
   // ==========================================
@@ -185,6 +160,7 @@ function DeveloperLogin() {
         emailRef.current
           ?.value
           .trim() || "";
+
 
       const password =
         passwordRef.current
@@ -220,16 +196,27 @@ function DeveloperLogin() {
                   "application/json"
               },
 
-              body: JSON.stringify({
-                email,
-                password
-              })
+              body:
+                JSON.stringify({
+                  email,
+                  password
+                })
             }
           );
 
 
-        const data =
-          await response.json();
+        let data = {};
+
+
+        try {
+
+          data =
+            await response.json();
+
+        } catch {
+
+          data = {};
+        }
 
 
         if (!response.ok) {
@@ -244,7 +231,8 @@ function DeveloperLogin() {
 
 
         if (
-          data.role !== "DEVELOPER"
+          data.role !==
+          "DEVELOPER"
         ) {
 
           setError(
@@ -343,11 +331,9 @@ function DeveloperLogin() {
       } finally {
 
         setLoading(false);
-
       }
 
     };
-
 
 
   return (
@@ -389,9 +375,11 @@ function DeveloperLogin() {
           <button
             type="button"
             className="admin-login-error-close"
+
             onClick={() =>
               setError("")
             }
+
             aria-label="Close message"
           >
 
@@ -407,7 +395,6 @@ function DeveloperLogin() {
       )}
 
 
-
       {/* ======================================
           BRAND
       ====================================== */}
@@ -415,7 +402,6 @@ function DeveloperLogin() {
       <div className="admin-login-brand">
         FALDREN
       </div>
-
 
 
       <div className="admin-login-grid">
@@ -471,7 +457,6 @@ function DeveloperLogin() {
         </section>
 
 
-
         {/* ======================================
             RIGHT
         ====================================== */}
@@ -497,7 +482,6 @@ function DeveloperLogin() {
           </div>
 
 
-
           <div className="admin-login-form-wrap">
 
             <h2>
@@ -514,7 +498,9 @@ function DeveloperLogin() {
 
 
             <form
-              onSubmit={handleSubmit}
+              onSubmit={
+                handleSubmit
+              }
             >
 
 
@@ -533,17 +519,25 @@ function DeveloperLogin() {
 
                 <input
                   ref={emailRef}
+
                   id="developer-email"
+
                   name="email"
+
                   type="email"
+
                   placeholder="Enter developer email"
+
                   autoComplete="username"
-                  disabled={loading}
+
+                  disabled={
+                    loading
+                  }
+
                   required
                 />
 
               </div>
-
 
 
               {/* ==================================
@@ -563,30 +557,45 @@ function DeveloperLogin() {
 
                   <input
                     ref={passwordRef}
+
                     id="developer-password"
+
                     name="password"
+
                     type={
                       showPassword
                         ? "text"
                         : "password"
                     }
+
                     placeholder="Enter your password"
+
                     autoComplete="current-password"
-                    disabled={loading}
+
+                    disabled={
+                      loading
+                    }
+
                     required
                   />
 
 
                   <button
                     type="button"
+
                     className="admin-password-toggle"
+
                     onClick={() =>
                       setShowPassword(
                         current =>
                           !current
                       )
                     }
-                    disabled={loading}
+
+                    disabled={
+                      loading
+                    }
+
                     aria-label={
                       showPassword
                         ? "Hide password"
@@ -617,15 +626,18 @@ function DeveloperLogin() {
               </div>
 
 
-
               {/* ==================================
                   LOGIN
               ================================== */}
 
               <button
                 type="submit"
+
                 className="admin-login-submit"
-                disabled={loading}
+
+                disabled={
+                  loading
+                }
               >
 
                 <span>
@@ -656,7 +668,6 @@ function DeveloperLogin() {
             </p>
 
           </div>
-
 
 
           <div className="admin-login-panel-footer">
