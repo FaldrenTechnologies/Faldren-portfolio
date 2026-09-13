@@ -22,5 +22,6 @@ public interface ConversationRepository
     );
 
     List<Conversation> findAllByOrderByUpdatedAtDesc();
+    List<Conversation> findByClient(User client);
 
 }

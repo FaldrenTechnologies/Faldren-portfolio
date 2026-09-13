@@ -17,7 +17,8 @@ import "../admin.css";
 
 
 const API_BASE =
-  (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080");
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:8080";
 
 
 function AdminClients() {
@@ -34,11 +35,50 @@ function AdminClients() {
   const [error, setError] =
     useState("");
 
+  const [openMenuId, setOpenMenuId] =
+    useState(null);
+
+  const [
+    deletingClientId,
+    setDeletingClientId
+  ] = useState(null);
+
 
   const adminName =
     localStorage.getItem(
       "adminName"
     ) || "Administrator";
+
+
+  // ==========================================
+  // LOGOUT ADMIN
+  // ==========================================
+
+  const clearAdminSession = () => {
+
+    localStorage.removeItem(
+      "adminToken"
+    );
+
+    localStorage.removeItem(
+      "adminName"
+    );
+
+    localStorage.removeItem(
+      "adminEmail"
+    );
+
+    localStorage.removeItem(
+      "adminRole"
+    );
+
+    localStorage.removeItem(
+      "adminLoggedIn"
+    );
+
+    window.location.href =
+      "/admin/login";
+  };
 
 
   // ==========================================
@@ -88,30 +128,7 @@ function AdminClients() {
           response.status === 403
         ) {
 
-          localStorage.removeItem(
-            "adminToken"
-          );
-
-          localStorage.removeItem(
-            "adminName"
-          );
-
-          localStorage.removeItem(
-            "adminEmail"
-          );
-
-          localStorage.removeItem(
-            "adminRole"
-          );
-
-          localStorage.removeItem(
-            "adminLoggedIn"
-          );
-
-
-          window.location.href =
-            "/admin/login";
-
+          clearAdminSession();
           return;
         }
 
@@ -154,9 +171,7 @@ function AdminClients() {
       } finally {
 
         setLoading(false);
-
       }
-
     };
 
 
@@ -165,6 +180,132 @@ function AdminClients() {
     loadClients();
 
   }, []);
+
+
+  // ==========================================
+  // DELETE CLIENT
+  // ==========================================
+
+  const handleDeleteClient =
+    async (client) => {
+
+      const confirmed =
+        window.confirm(
+          `Delete ${client.fullName}?\n\n` +
+          "This will permanently delete this client and all related project, request and message data."
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      const token =
+        localStorage.getItem(
+          "adminToken"
+        );
+
+
+      if (!token) {
+
+        clearAdminSession();
+        return;
+      }
+
+
+      try {
+
+        setDeletingClientId(
+          client.id
+        );
+
+        setError("");
+
+
+        const response =
+          await fetch(
+            `${API_BASE}/api/admin/clients/${client.id}`,
+            {
+              method: "DELETE",
+
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+
+          clearAdminSession();
+          return;
+        }
+
+
+        let data = {};
+
+
+        try {
+
+          data =
+            await response.json();
+
+        } catch {
+
+          data = {};
+        }
+
+
+        if (!response.ok) {
+
+          setError(
+            data.message ||
+            "Unable to delete client."
+          );
+
+          return;
+        }
+
+
+        setClients(
+          current =>
+            current.filter(
+              item =>
+                item.id !== client.id
+            )
+        );
+
+
+        setOpenMenuId(
+          null
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Delete client error:",
+          error
+        );
+
+
+        setError(
+          "Unable to connect to the backend."
+        );
+
+
+      } finally {
+
+        setDeletingClientId(
+          null
+        );
+      }
+    };
 
 
   // ==========================================
@@ -348,6 +489,7 @@ function AdminClients() {
               type="text"
               placeholder="Search clients..."
               value={search}
+
               onChange={
                 (event) =>
                   setSearch(
@@ -363,7 +505,7 @@ function AdminClients() {
             className="admin-add-client"
             type="button"
             disabled
-            title="Client creation from admin will be added next"
+            title="Clients register through the client portal"
           >
 
             <Plus
@@ -387,8 +529,10 @@ function AdminClients() {
             style={{
               marginBottom: "20px",
               padding: "14px 16px",
+
               border:
                 "1px solid rgba(130, 74, 60, 0.25)",
+
               color: "#7c463b"
             }}
           >
@@ -563,12 +707,25 @@ function AdminClients() {
 
                     {/* ACTION */}
 
-                    <div className="admin-client-menu">
+                    <div
+                      className="admin-client-menu"
+                      style={{
+                        position: "relative"
+                      }}
+                    >
 
                       <button
                         type="button"
                         aria-label="Client actions"
-                        title="Client management will be added next"
+
+                        onClick={() =>
+                          setOpenMenuId(
+                            current =>
+                              current === client.id
+                                ? null
+                                : client.id
+                          )
+                        }
                       >
 
                         <MoreHorizontal
@@ -577,6 +734,97 @@ function AdminClients() {
                         />
 
                       </button>
+
+
+                      {openMenuId ===
+                        client.id && (
+
+                        <div
+                          style={{
+                            position: "absolute",
+                            right: 0,
+                            top: "36px",
+                            zIndex: 100,
+
+                            width: "165px",
+
+                            padding: "6px",
+
+                            background:
+                              "#f5f1e8",
+
+                            border:
+                              "1px solid rgba(30,30,26,0.16)",
+
+                            boxShadow:
+                              "0 14px 30px rgba(20,20,18,0.14)"
+                          }}
+                        >
+
+                          <button
+                            type="button"
+
+                            disabled={
+                              deletingClientId ===
+                              client.id
+                            }
+
+                            onClick={() =>
+                              handleDeleteClient(
+                                client
+                              )
+                            }
+
+                            style={{
+                              width: "100%",
+
+                              padding:
+                                "10px 12px",
+
+                              border: "none",
+
+                              background:
+                                "transparent",
+
+                              textAlign:
+                                "left",
+
+                              fontFamily:
+                                "inherit",
+
+                              fontSize:
+                                "11px",
+
+                              letterSpacing:
+                                "0.04em",
+
+                              color:
+                                "#8a4037",
+
+                              cursor:
+                                deletingClientId ===
+                                client.id
+                                  ? "not-allowed"
+                                  : "pointer",
+
+                              opacity:
+                                deletingClientId ===
+                                client.id
+                                  ? 0.55
+                                  : 1
+                            }}
+                          >
+
+                            {deletingClientId ===
+                            client.id
+                              ? "Deleting..."
+                              : "Delete client"}
+
+                          </button>
+
+                        </div>
+
+                      )}
 
                     </div>
 

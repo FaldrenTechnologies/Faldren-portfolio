@@ -1,65 +1,84 @@
 package com.faldren.controller;
 
 import com.faldren.dto.AdminClientResponse;
-import com.faldren.entity.Role;
-import com.faldren.entity.User;
-import com.faldren.repository.UserRepository;
+import com.faldren.service.AdminClientService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/admin/clients")
 public class AdminClientController {
 
-    private final UserRepository userRepository;
+    private final AdminClientService
+            adminClientService;
 
 
     public AdminClientController(
-            UserRepository userRepository
+            AdminClientService adminClientService
     ) {
-        this.userRepository =
-                userRepository;
+
+        this.adminClientService =
+                adminClientService;
     }
 
+
+    // ==========================================
+    // GET CLIENTS
+    // ==========================================
 
     @GetMapping
     public ResponseEntity<List<AdminClientResponse>>
     getAllClients() {
 
-        List<AdminClientResponse> clients =
-                userRepository
-                        .findByRole(Role.CLIENT)
-                        .stream()
-                        .map(this::toResponse)
-                        .toList();
-
-
         return ResponseEntity.ok(
-                clients
+                adminClientService
+                        .getAllClients()
         );
     }
 
 
-    private AdminClientResponse toResponse(
-            User user
+    // ==========================================
+    // DELETE CLIENT
+    // ==========================================
+
+    @DeleteMapping("/{clientId}")
+    public ResponseEntity<?>
+    deleteClient(
+            @PathVariable
+            Long clientId
     ) {
 
-        return new AdminClientResponse(
+        try {
 
-                user.getId(),
+            adminClientService
+                    .deleteClient(
+                            clientId
+                    );
 
-                user.getFullName(),
 
-                user.getCompanyName(),
+            return ResponseEntity.ok(
+                    Map.of(
+                            "message",
+                            "Client deleted successfully."
+                    )
+            );
 
-                user.getEmail(),
 
-                user.getPhone(),
+        } catch (RuntimeException exception) {
 
-                user.getCreatedAt()
-        );
+            return ResponseEntity
+                    .badRequest()
+                    .body(
+                            Map.of(
+                                    "message",
+                                    exception.getMessage()
+                            )
+                    );
+        }
     }
 }
