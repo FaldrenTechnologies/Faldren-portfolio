@@ -1,26 +1,30 @@
 package com.faldren.service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private final BrevoEmailClient
+            brevoEmailClient;
 
 
-    @Value("${spring.mail.username}")
-    private String fromEmail;
+    @Value("${app.brevo.otp-sender-email}")
+    private String otpSenderEmail;
+
+
+    @Value("${app.brevo.otp-sender-name:FALDREN OTP}")
+    private String otpSenderName;
 
 
     public EmailService(
-            JavaMailSender mailSender
+            BrevoEmailClient brevoEmailClient
     ) {
 
-        this.mailSender = mailSender;
+        this.brevoEmailClient =
+                brevoEmailClient;
     }
 
 
@@ -29,30 +33,26 @@ public class EmailService {
             String otp
     ) {
 
-        SimpleMailMessage message =
-                new SimpleMailMessage();
+        String subject =
+                "Your FALDREN verification code";
 
 
-        message.setFrom(fromEmail);
-
-        message.setTo(toEmail);
-
-        message.setSubject(
-                "Your FALDREN verification code"
-        );
-
-
-        message.setText(
+        String content =
                 "Welcome to FALDREN.\n\n"
                 + "Your verification code is:\n\n"
                 + otp
                 + "\n\nThis OTP is valid for 5 minutes."
                 + "\n\nIf you did not request this code, "
                 + "you can ignore this email."
-                + "\n\n— FALDREN"
+                + "\n\n— FALDREN";
+
+
+        brevoEmailClient.sendEmail(
+                otpSenderName,
+                otpSenderEmail,
+                toEmail,
+                subject,
+                content
         );
-
-
-        mailSender.send(message);
     }
 }
