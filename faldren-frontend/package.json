@@ -19,5 +19,8 @@
     "react-router-dom": "^7.18.3",
     "typescript": "latest",
     "vite": "latest"
+  },
+  "devDependencies": {
+    "wrangler": "^4.131.1"
   }
 }
